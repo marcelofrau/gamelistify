@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        x:Class="Gamelistify.Views.ScanRomsWindow"
+        x:DataType="vm:ScanRomsViewModel"
+        Title="Scan ROMs"
+        Width="860"
+        Height="620"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+      <TextBlock Grid.Row="0" Classes="section-title" Text="Scan Results" />
+      <StackPanel Grid.Row="1" Spacing="4">
+        <TextBlock Text="{Binding Summary}" />
+        <TextBlock Classes="muted" Text="{Binding Directory}" TextWrapping="Wrap" />
+      </StackPanel>
+
+      <DataGrid Grid.Row="2"
+                ItemsSource="{Binding Items}"
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True"
+                GridLinesVisibility="All"
+                HeadersVisibility="All"
+                RowBackground="#151413">
+        <DataGrid.Columns>
+          <DataGridCheckBoxColumn Header="Add" Binding="{Binding IsSelected}" Width="70" />
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+          <DataGridTextColumn Header="Relative Path" Binding="{Binding RelativePath}" Width="3*" />
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
+        <Button Grid.Column="0" Classes="command-button" Command="{Binding SelectAllCommand}" Content="Select All" ToolTip.Tip="Check all found ROMs for addition" />
+        <Button Grid.Column="1" Classes="command-button" Command="{Binding ClearSelectionCommand}" Content="Clear" ToolTip.Tip="Uncheck all ROMs" />
+        <TextBlock Grid.Column="3" VerticalAlignment="Center" Classes="muted" Text="Checked items will be added to the current gamelist." />
+        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="10">
+          <Button Classes="command-button primary" Command="{Binding AcceptCommand}" Click="OnAddClick" Content="Add Selected" ToolTip.Tip="Add checked ROMs to the gamelist" />
+          <Button Classes="command-button" Click="OnCancelClick" Content="Cancel" ToolTip.Tip="Discard scan results" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

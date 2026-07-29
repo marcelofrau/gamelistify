@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        x:Class="Gamelistify.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Settings"
+        Width="620"
+        Height="420"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="18">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+      <TextBlock Grid.Row="0" Classes="section-title" Text="Application Settings" />
+
+      <Grid Grid.Row="1" ColumnDefinitions="170,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="Skyscraper binary" />
+        <TextBox Grid.Column="1" Text="{Binding SkyscraperBinaryPath}" />
+      </Grid>
+
+      <Grid Grid.Row="2" ColumnDefinitions="170,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="ScreenScraper user" />
+        <TextBox Grid.Column="1" Text="{Binding ScreenScraperUser}" />
+      </Grid>
+
+      <Grid Grid.Row="3" ColumnDefinitions="170,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="ScreenScraper password" />
+        <TextBox Grid.Column="1" PasswordChar="*" Text="{Binding ScreenScraperPassword}" />
+      </Grid>
+
+      <Grid Grid.Row="4" ColumnDefinitions="170,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="Image preview size" />
+        <NumericUpDown Grid.Column="1" Minimum="120" Maximum="520" Increment="10" Value="{Binding ImagePreviewSize}" />
+      </Grid>
+
+      <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="command-button primary" Content="Save" Command="{Binding SaveCommand}" Click="OnSaveClick" ToolTip.Tip="Save settings and close" />
+        <Button Classes="command-button" Content="Cancel" Click="OnCancelClick" ToolTip.Tip="Discard changes and close" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

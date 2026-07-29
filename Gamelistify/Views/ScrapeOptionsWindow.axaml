@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        x:Class="Gamelistify.Views.ScrapeOptionsWindow"
+        x:DataType="vm:ScrapeOptionsViewModel"
+        Title="Scrape Options"
+        Width="560"
+        Height="280"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+      <TextBlock Grid.Row="0" Classes="section-title" Text="{Binding Title}" />
+      <Grid Grid.Row="1" ColumnDefinitions="130,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="Platform" />
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Platforms}" SelectedItem="{Binding SelectedPlatform, Mode=TwoWay}" />
+      </Grid>
+      <Grid Grid.Row="2" ColumnDefinitions="130,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="Extra arguments" />
+        <TextBox Grid.Column="1" Text="{Binding ExtraArguments}" />
+      </Grid>
+      <TextBlock Grid.Row="3" Classes="muted" Text="Credentials and binary path are read from application settings." TextWrapping="Wrap" />
+      <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="command-button primary" Content="Start" Command="{Binding AcceptCommand}" Click="OnStartClick" ToolTip.Tip="Begin scraping with these options" />
+        <Button Classes="command-button" Content="Cancel" Click="OnCancelClick" ToolTip.Tip="Cancel and go back" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

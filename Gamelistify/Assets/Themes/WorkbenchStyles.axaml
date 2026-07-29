@@ -1,0 +1,228 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource WorkbenchBg}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Setter Property="FontFamily" Value="fonts:SpaceGrotesk#Space Grotesk" />
+  </Style>
+
+  <Style Selector="ToolTip">
+    <Setter Property="Background" Value="{StaticResource WorkbenchSurfaceAlt}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="10,6" />
+  </Style>
+
+  <Style Selector="Border.panel">
+    <Setter Property="Background" Value="{StaticResource WorkbenchSurface}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+
+  <Style Selector="Border.toolbar-shell">
+    <Setter Property="Background" Value="{StaticResource WorkbenchToolbarBg}" />
+    <Setter Property="BorderBrush" Value="#AA1816" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="CornerRadius" Value="0" />
+  </Style>
+
+  <Style Selector="Border.toolbar-group-separator">
+    <Setter Property="Background" Value="#AA1816" />
+    <Setter Property="Width" Value="1" />
+    <Setter Property="Margin" Value="4,2" />
+  </Style>
+
+  <Style Selector="TextBlock.section-title">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+  </Style>
+
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchTextMuted}" />
+  </Style>
+
+  <Style Selector="Button.command-button">
+    <Setter Property="Background" Value="#00000000" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="6,5" />
+    <Setter Property="MinHeight" Value="40" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="#332E2D2B" />
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="#553C3126" />
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccentDeep}" />
+    </Style>
+  </Style>
+
+  <Style Selector="Button.command-button.primary">
+    <Setter Property="Background" Value="{StaticResource WorkbenchAccent}" />
+    <Setter Property="Foreground" Value="#22160E" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccentDeep}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{StaticResource WorkbenchAccentGlow}" />
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="{StaticResource WorkbenchAccentDeep}" />
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+    </Style>
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button">
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Background" Value="#00000000" />
+    <Setter Property="Foreground" Value="#22160E" />
+    <Setter Property="BorderBrush" Value="#00000000" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="6,5" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0" Color="#FFF5E6" />
+            <GradientStop Offset="0.2" Color="#F5A65B" />
+            <GradientStop Offset="0.5" Color="#E07C30" />
+            <GradientStop Offset="1" Color="#BA5A14" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderBrush" Value="#C1641E" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0" Color="#8A3E0A" />
+            <GradientStop Offset="0.5" Color="#BA5A14" />
+            <GradientStop Offset="1" Color="#E07C30" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderBrush" Value="#8A3E0A" />
+    </Style>
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button:disabled">
+    <Setter Property="Opacity" Value="0.75" />
+    <Setter Property="Background" Value="#00000000" />
+    <Setter Property="BorderBrush" Value="#00000000" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button TextBlock.toolbar-label">
+    <Setter Property="Foreground" Value="#22160E" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="TextBlock.toolbar-label">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+  </Style>
+
+  <Style Selector="Image.toolbar-icon">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="Button.link-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchLink}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{StaticResource WorkbenchAccent}" />
+    </Style>
+  </Style>
+
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="{StaticResource WorkbenchSurface}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorder}" />
+  </Style>
+
+  <Style Selector="DataGridCell:current">
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="#171615" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Style Selector="^:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+    </Style>
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="#171615" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+  </Style>
+
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchTextMuted}" />
+  </Style>
+
+  <Style Selector="NumericUpDown">
+    <Setter Property="Background" Value="#171615" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+    <Style Selector="^:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+    </Style>
+  </Style>
+
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="{StaticResource WorkbenchSurface}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorder}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
+  </Style>
+
+  <Style Selector="ScrollViewer">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button:disabled">
+    <Setter Property="Background" Value="{StaticResource WorkbenchDisabledBg}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchDisabledFg}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+  </Style>
+
+  <Style Selector="Button.command-button:disabled Image.toolbar-icon">
+    <Setter Property="Opacity" Value="0.3" />
+  </Style>
+
+  <Style Selector="Button.command-button:disabled TextBlock.toolbar-label">
+    <Setter Property="Opacity" Value="0.4" />
+  </Style>
+
+  <Style Selector="Button.command-button.primary:disabled">
+    <Setter Property="Background" Value="{StaticResource WorkbenchDisabledBg}" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchDisabledFg}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+  </Style>
+
+  <Style Selector="Button.command-button.primary:disabled Image.toolbar-icon">
+    <Setter Property="Opacity" Value="0.25" />
+  </Style>
+
+  <Style Selector="Image.preview-image">
+    <Setter Property="Stretch" Value="Uniform" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="MaxHeight" Value="170" />
+  </Style>
+</Styles>

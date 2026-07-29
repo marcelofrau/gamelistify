@@ -1,0 +1,202 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
+        x:Class="Gamelistify.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/gamelistify.ico"
+        Title="{Binding WindowTitle}"
+        Width="1440"
+        Height="900"
+        MinWidth="1100"
+        MinHeight="720">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="0">
+        <Border Grid.Row="0" Classes="toolbar-shell" Padding="8,6" Margin="0">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="0">
+                <Button Grid.Column="0" Classes="command-button toolbar-button" Command="{Binding OpenCommand}" ToolTip.Tip="Open a gamelist.xml file">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Open" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1" Classes="command-button toolbar-button" Command="{Binding SaveCommand}" ToolTip.Tip="Save current gamelist and create a backup">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Save" />
+                    </StackPanel>
+                </Button>
+                <Border Grid.Column="2" Classes="toolbar-group-separator" />
+                <Button Grid.Column="3" Classes="command-button toolbar-button" Command="{Binding ScanRomsCommand}" ToolTip.Tip="Scan a ROM directory and add missing entries">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scan-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Scan" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" Classes="command-button toolbar-button" Command="{Binding ScrapeSelectedCommand}" ToolTip.Tip="Run Skyscraper for selected entries">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scrapesel-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Scrape Sel" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="5" Classes="command-button toolbar-button" Command="{Binding ScrapeAllCommand}" ToolTip.Tip="Run Skyscraper for the whole loaded library">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scrapeall-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Scrape All" />
+                    </StackPanel>
+                </Button>
+                <Border Grid.Column="6" Classes="toolbar-group-separator" />
+                <Button Grid.Column="7" Classes="command-button toolbar-button" Command="{Binding HideSelectedCommand}" ToolTip.Tip="Hide all selected entries">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-hide-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Hide" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="8" Classes="command-button toolbar-button" Command="{Binding UnhideSelectedCommand}" ToolTip.Tip="Unhide all selected entries">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-unhide-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Unhide" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="9" Classes="command-button toolbar-button" Command="{Binding FavoriteSelectedCommand}" ToolTip.Tip="Mark selected entries as favorites">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-favorite-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Fav" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="10" Classes="command-button toolbar-button" Command="{Binding UnfavoriteSelectedCommand}" ToolTip.Tip="Remove favorite flag from selected entries">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-unfavorite-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Unfav" />
+                    </StackPanel>
+                </Button>
+                <Border Grid.Column="11" Classes="toolbar-group-separator" />
+                <Button Grid.Column="12" Classes="command-button toolbar-button" Command="{Binding OpenSettingsCommand}" HorizontalAlignment="Right" ToolTip.Tip="Open application settings">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-settings-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Settings" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="13" Classes="command-button toolbar-button" Command="{Binding OpenAboutCommand}" HorizontalAlignment="Right" ToolTip.Tip="Show version, license, and project links">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-about-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="About" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Classes="panel" Padding="14" Margin="16,12,16,0">
+            <Grid ColumnDefinitions="280,160,220,Auto,*,Auto" ColumnSpacing="10">
+                <TextBox Grid.Column="0" PlaceholderText="Search by name, genre, developer" Text="{Binding SearchText}" />
+                <ComboBox Grid.Column="1" SelectedIndex="0">
+                    <ComboBoxItem Content="All Entries" />
+                    <ComboBoxItem Content="Games" />
+                    <ComboBoxItem Content="Folders" />
+                </ComboBox>
+                <ComboBox Grid.Column="2"
+                          ItemsSource="{Binding RecentFiles}"
+                          SelectedItem="{Binding SelectedRecentFile, Mode=TwoWay}"
+                          IsEnabled="{Binding HasRecentFiles}" />
+                <Button Grid.Column="3" Classes="command-button" Command="{Binding OpenRecentCommand}" Content="Open Recent" />
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="8">
+                    <CheckBox Content="Name" IsChecked="{Binding ShowNameColumn}" />
+                    <CheckBox Content="Genre" IsChecked="{Binding ShowGenreColumn}" />
+                    <CheckBox Content="Developer" IsChecked="{Binding ShowDeveloperColumn}" />
+                    <CheckBox Content="Hidden" IsChecked="{Binding ShowHiddenColumn}" />
+                    <CheckBox Content="Favorite" IsChecked="{Binding ShowFavoriteColumn}" />
+                </StackPanel>
+                <ComboBox Grid.Column="5" SelectedIndex="0" IsVisible="False">
+                    <ComboBoxItem Content="All Profiles" />
+                    <ComboBoxItem Content="RetroBat" />
+                    <ComboBoxItem Content="Batocera" />
+                    <ComboBoxItem Content="ES-DE" />
+                </ComboBox>
+                <TextBlock Grid.Column="4" VerticalAlignment="Center" Classes="muted" Text="{Binding CurrentFilePath}" TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,6,420" ColumnSpacing="0" Margin="16,12,16,0">
+            <Border Grid.Column="0" Classes="panel" Padding="10">
+                <DataGrid ItemsSource="{Binding VisibleEntries}"
+                          x:Name="EntriesGrid"
+                          AutoGenerateColumns="False"
+                          GridLinesVisibility="All"
+                          HeadersVisibility="All"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                          SelectionChanged="OnEntriesSelectionChanged"
+                          SelectionMode="Extended"
+                          RowBackground="#151413">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Type" Binding="{Binding ItemType}" Width="90" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" IsVisible="{Binding $parent[Window].DataContext.ShowNameColumn}" />
+                        <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="3*" />
+                        <DataGridCheckBoxColumn Header="Hidden" Binding="{Binding Hidden}" Width="90" IsVisible="{Binding $parent[Window].DataContext.ShowHiddenColumn}" />
+                        <DataGridCheckBoxColumn Header="Favorite" Binding="{Binding Favorite}" Width="90" IsVisible="{Binding $parent[Window].DataContext.ShowFavoriteColumn}" />
+                        <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="140" IsVisible="{Binding $parent[Window].DataContext.ShowGenreColumn}" />
+                        <DataGridTextColumn Header="Developer" Binding="{Binding Developer}" Width="180" IsVisible="{Binding $parent[Window].DataContext.ShowDeveloperColumn}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="{StaticResource WorkbenchBorder}" />
+
+            <Border Grid.Column="2" Classes="panel" Padding="14" Margin="12,0,0,0">
+                <Grid RowDefinitions="Auto,Auto,200,Auto,*" RowSpacing="12">
+                    <TextBlock Grid.Row="0" Classes="section-title" Text="{Binding DetailTitle}" />
+                    <TextBlock Grid.Row="1" Classes="muted" Text="{Binding DetailPath}" TextWrapping="Wrap" />
+
+                    <Border Grid.Row="2" Background="{StaticResource WorkbenchSurfaceAlt}" BorderBrush="{StaticResource WorkbenchAccent}" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <Grid RowDefinitions="*,Auto">
+                            <Border Background="#101012" CornerRadius="6">
+                                <Grid>
+                                    <Image Classes="preview-image" Source="{Binding DetailImage}" IsVisible="{Binding HasDetailImage}" />
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Classes="muted" IsVisible="{Binding ShowPreviewPlaceholder}" Text="No preview available" />
+                                </Grid>
+                            </Border>
+                            <TextBlock Grid.Row="1" Margin="0,10,0,0" Classes="muted" Text="{Binding DetailImageStatus}" TextWrapping="Wrap" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="3" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
+                        <TextBlock Grid.Row="0" Classes="section-title" Text="Selected Entry" />
+                        <TextBox Grid.Row="1" Text="{Binding DetailNameEdit}" PlaceholderText="Name" />
+                        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <TextBox Text="{Binding DetailGenreEdit}" PlaceholderText="Genre" />
+                            <TextBox Grid.Column="1" Text="{Binding DetailDeveloperEdit}" PlaceholderText="Developer" />
+                        </Grid>
+                        <TextBox Grid.Row="3" Text="{Binding DetailDescriptionEdit}" AcceptsReturn="True" Height="86" TextWrapping="Wrap" PlaceholderText="Description" />
+                        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="16">
+                            <CheckBox Content="Favorite" IsChecked="{Binding DetailFavoriteEdit}" />
+                            <CheckBox Content="Hidden" IsChecked="{Binding DetailHiddenEdit}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="5" Classes="section-title" Text="Selection Summary" />
+                        <TextBlock Grid.Row="6" Text="{Binding DetailSummary}" TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Border Grid.Row="4" Background="{StaticResource WorkbenchSurfaceAlt}" CornerRadius="8" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section-title" Text="Quick Tips" />
+                            <TextBlock Classes="muted" TextWrapping="Wrap" Text="Use Ctrl+O to open a gamelist. Ctrl+S to save. Select entries to edit fields below. Use the toolbar to bulk hide, favorite, or scrape metadata." />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3" Margin="16,12,16,16" Padding="12,8" Background="{StaticResource WorkbenchSurface}">
+            <TextBlock Classes="muted" Text="{Binding StatusText}" />
+        </Border>
+    </Grid>
+
+</Window>

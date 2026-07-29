@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        x:Class="Gamelistify.Views.AboutWindow"
+        x:DataType="vm:AboutViewModel"
+        Title="About Gamelistify"
+        Width="520"
+        Height="420"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="18">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+      <TextBlock Grid.Row="0" Classes="section-title" Text="{Binding ProjectName}" FontSize="24" />
+      <TextBlock Grid.Row="1" Text="{Binding Description}" TextWrapping="Wrap" />
+
+      <Grid Grid.Row="2" ColumnDefinitions="Auto,*" ColumnSpacing="10">
+        <TextBlock Text="Version" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding Version}" />
+      </Grid>
+
+      <Grid Grid.Row="3" ColumnDefinitions="Auto,*" ColumnSpacing="10">
+        <TextBlock Text="Build" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding Build}" />
+      </Grid>
+
+      <Border Grid.Row="4" Background="{StaticResource WorkbenchSurfaceAlt}" CornerRadius="8" Padding="12">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <TextBlock Text="Author" Classes="muted" />
+            <TextBlock Grid.Column="1" Text="{Binding Author}" />
+          </Grid>
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <TextBlock Text="License" Classes="muted" />
+            <TextBlock Grid.Column="1" Text="{Binding License}" />
+          </Grid>
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <TextBlock Text="Repository" Classes="muted" />
+            <Button Grid.Column="1" Classes="link-button" HorizontalAlignment="Left" Content="{Binding RepositoryUrl}" Click="OnRepositoryClick" />
+          </Grid>
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <TextBlock Text="Issues" Classes="muted" />
+            <Button Grid.Column="1" Classes="link-button" HorizontalAlignment="Left" Content="{Binding IssueTrackerUrl}" Click="OnIssuesClick" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Button Grid.Row="5" HorizontalAlignment="Right" MinWidth="120" Classes="command-button primary" Content="Close" Click="OnCloseClick" ToolTip.Tip="Close the About window" />
+    </Grid>
+  </Border>
+</Window>

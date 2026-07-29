@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gameList>
+  <game>
+    <path>Alien Soldier.zip</path>
+    <name>Alien Soldier</name>
+    <desc>Boss-heavy action game.</desc>
+    <image>./images/Alien Soldier.png</image>
+    <favorite>true</favorite>
+    <customTag>keep me</customTag>
+  </game>
+  <folder>
+    <path>./Shmups</path>
+    <name>Shmups</name>
+    <hidden>1</hidden>
+  </folder>
+</gameList>

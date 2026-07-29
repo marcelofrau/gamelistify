@@ -1,0 +1,53 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Color x:Key="WorkbenchBgColor">#181716</Color>
+  <Color x:Key="WorkbenchSurfaceColor">#23211F</Color>
+  <Color x:Key="WorkbenchSurfaceAltColor">#2E2D2B</Color>
+  <Color x:Key="WorkbenchToolbarColor">#201E1C</Color>
+  <Color x:Key="WorkbenchToolbarEdgeColor">#11100F</Color>
+  <Color x:Key="WorkbenchAccentColor">#E07C30</Color>
+  <Color x:Key="WorkbenchAccentGlowColor">#F5A65B</Color>
+  <Color x:Key="WorkbenchAccentDeepColor">#C1641E</Color>
+  <Color x:Key="WorkbenchSuccessColor">#6CAE75</Color>
+  <Color x:Key="WorkbenchWarningColor">#E4B44A</Color>
+  <Color x:Key="WorkbenchDangerColor">#CF684F</Color>
+  <Color x:Key="WorkbenchBorderColor">#4A4138</Color>
+  <Color x:Key="WorkbenchBorderSoftColor">#38312B</Color>
+  <Color x:Key="WorkbenchTextColor">#F5EEE7</Color>
+  <Color x:Key="WorkbenchTextMutedColor">#B8AA99</Color>
+  <Color x:Key="WorkbenchTextDimColor">#8B7E70</Color>
+  <Color x:Key="WorkbenchLinkColor">#6BB5E0</Color>
+  <Color x:Key="WorkbenchLinkVisitedColor">#A07CC0</Color>
+  <Color x:Key="WorkbenchDisabledBgColor">#2A2826</Color>
+  <Color x:Key="WorkbenchDisabledFgColor">#5C554B</Color>
+  <Color x:Key="WorkbenchSelectionColor">#3C3126</Color>
+
+  <SolidColorBrush x:Key="WorkbenchBg" Color="{StaticResource WorkbenchBgColor}" />
+  <SolidColorBrush x:Key="WorkbenchSurface" Color="{StaticResource WorkbenchSurfaceColor}" />
+  <SolidColorBrush x:Key="WorkbenchSurfaceAlt" Color="{StaticResource WorkbenchSurfaceAltColor}" />
+  <SolidColorBrush x:Key="WorkbenchToolbar" Color="{StaticResource WorkbenchToolbarColor}" />
+  <SolidColorBrush x:Key="WorkbenchToolbarEdge" Color="{StaticResource WorkbenchToolbarEdgeColor}" />
+  <SolidColorBrush x:Key="WorkbenchAccent" Color="{StaticResource WorkbenchAccentColor}" />
+  <SolidColorBrush x:Key="WorkbenchAccentGlow" Color="{StaticResource WorkbenchAccentGlowColor}" />
+  <SolidColorBrush x:Key="WorkbenchAccentDeep" Color="{StaticResource WorkbenchAccentDeepColor}" />
+  <SolidColorBrush x:Key="WorkbenchBorder" Color="{StaticResource WorkbenchBorderColor}" />
+  <SolidColorBrush x:Key="WorkbenchBorderSoft" Color="{StaticResource WorkbenchBorderSoftColor}" />
+  <SolidColorBrush x:Key="WorkbenchText" Color="{StaticResource WorkbenchTextColor}" />
+  <SolidColorBrush x:Key="WorkbenchTextMuted" Color="{StaticResource WorkbenchTextMutedColor}" />
+  <SolidColorBrush x:Key="WorkbenchTextDim" Color="{StaticResource WorkbenchTextDimColor}" />
+  <SolidColorBrush x:Key="WorkbenchSuccess" Color="{StaticResource WorkbenchSuccessColor}" />
+  <SolidColorBrush x:Key="WorkbenchWarning" Color="{StaticResource WorkbenchWarningColor}" />
+  <SolidColorBrush x:Key="WorkbenchDanger" Color="{StaticResource WorkbenchDangerColor}" />
+  <SolidColorBrush x:Key="WorkbenchLink" Color="{StaticResource WorkbenchLinkColor}" />
+  <SolidColorBrush x:Key="WorkbenchLinkVisited" Color="{StaticResource WorkbenchLinkVisitedColor}" />
+  <SolidColorBrush x:Key="WorkbenchDisabledBg" Color="{StaticResource WorkbenchDisabledBgColor}" />
+  <SolidColorBrush x:Key="WorkbenchDisabledFg" Color="{StaticResource WorkbenchDisabledFgColor}" />
+  <SolidColorBrush x:Key="WorkbenchSelection" Color="{StaticResource WorkbenchSelectionColor}" />
+
+  <LinearGradientBrush x:Key="WorkbenchToolbarBg" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="#E88A3E" />
+    <GradientStop Offset="1" Color="#C96E22" />
+  </LinearGradientBrush>
+
+  <Thickness x:Key="AppContentPadding">16</Thickness>
+</ResourceDictionary>

@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Gamelistify.SplashWindow"
+        Width="620"
+        Height="340"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowDecorations="None"
+        WindowStartupLocation="CenterScreen">
+  <Border Margin="16" Classes="panel" Padding="24">
+    <Grid RowDefinitions="*,Auto" RowSpacing="10">
+      <StackPanel VerticalAlignment="Center" Spacing="10">
+        <TextBlock Text="GAMELISTIFY" FontSize="34" FontWeight="Bold" HorizontalAlignment="Center" />
+        <TextBlock Text="Cross-platform gamelist.xml workstation" HorizontalAlignment="Center" Classes="muted" />
+        <TextBlock Text="Bootstrapping UI, settings, and services..." HorizontalAlignment="Center" Classes="muted" Margin="0,16,0,0" />
+      </StackPanel>
+      <TextBlock Grid.Row="1" Text="GPL-3.0-only" HorizontalAlignment="Center" Classes="muted" />
+    </Grid>
+  </Border>
+</Window>
