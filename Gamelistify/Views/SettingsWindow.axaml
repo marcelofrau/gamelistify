@@ -5,11 +5,11 @@
         x:DataType="vm:SettingsViewModel"
         Title="Settings"
         Width="620"
-        Height="420"
+        Height="500"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
   <Border Margin="16" Classes="panel" Padding="18">
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="12">
       <TextBlock Grid.Row="0" Classes="section-title" Text="Application Settings" />
 
       <Grid Grid.Row="1" ColumnDefinitions="170,*" ColumnSpacing="10">
@@ -32,9 +32,27 @@
         <NumericUpDown Grid.Column="1" Minimum="120" Maximum="520" Increment="10" Value="{Binding ImagePreviewSize}" />
       </Grid>
 
-      <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-        <Button Classes="command-button primary" Content="Save" Command="{Binding SaveCommand}" Click="OnSaveClick" ToolTip.Tip="Save settings and close" />
-        <Button Classes="command-button" Content="Cancel" Click="OnCancelClick" ToolTip.Tip="Discard changes and close" />
+      <Grid Grid.Row="5" ColumnDefinitions="170,*" ColumnSpacing="10">
+        <TextBlock VerticalAlignment="Center" Text="Log level" ToolTip.Tip="Changes apply immediately. Not persisted between restarts." />
+        <ComboBox Grid.Column="1"
+                  ItemsSource="{Binding LogLevelOptions}"
+                  SelectedIndex="{Binding SelectedLogLevelIndex}"
+                  HorizontalAlignment="Stretch" />
+      </Grid>
+
+      <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="command-button primary" Command="{Binding SaveCommand}" Click="OnSaveClick" ToolTip.Tip="Save settings and close">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Width="16" Height="16" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
+            <TextBlock Text="Save" />
+          </StackPanel>
+        </Button>
+        <Button Classes="command-button" Click="OnCancelClick" ToolTip.Tip="Discard changes and close">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Width="16" Height="16" Source="avares://Gamelistify/Assets/Views/AboutWindow/aboutwindow-close-32.png" />
+            <TextBlock Text="Cancel" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Grid>
   </Border>

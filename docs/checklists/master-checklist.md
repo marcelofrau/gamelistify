@@ -43,7 +43,16 @@ title: Master Checklist
 - [x] Add bulk actions workflow
 - [x] Add dirty-state indicators
 - [x] Add recent files support
-- [x] Add settings window
+- [x] Add settings window (log level combo, taller)
+- [x] Add Quick Tips flyout (green, styled FlyoutPresenter)
+- [x] Replace toolbar icons with personal icons8 set
+- [x] Add star rating control (5 clickable stars)
+- [x] Add confirmation dialogs (discard, remove)
+- [x] Add remove entry from detail view
+- [x] Add remove selected entries toolbar button
+- [x] Add BoolToStarBrush converter
+- [x] Add ConfirmWindow/ConfirmViewModel
+- [x] Add Serilog runtime level switching
 
 ## Phase 4 - Scraping Workflow
 

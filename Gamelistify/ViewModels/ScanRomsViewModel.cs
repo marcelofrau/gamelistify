@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
+using Gamelistify.Services;
 
 namespace Gamelistify.ViewModels;
 
@@ -40,6 +41,7 @@ public partial class ScanRomsViewModel : ViewModelBase
     [RelayCommand]
     private void Accept()
     {
+        Logger.Information("ScanRoms accept {Count} items from {Directory}", Items.Count, Directory);
         Accepted = true;
     }
 }

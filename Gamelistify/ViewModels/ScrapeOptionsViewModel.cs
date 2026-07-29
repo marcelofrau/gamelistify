@@ -23,6 +23,11 @@ public partial class ScrapeOptionsViewModel : ViewModelBase
     [ObservableProperty]
     private string _selectedPlatform = string.Empty;
 
+    partial void OnSelectedPlatformChanged(string value)
+    {
+        Logger.Debug("ScrapeOptions platform selected: {Platform}", value);
+    }
+
     [ObservableProperty]
     private string _extraArguments = "--flags unattend";
 

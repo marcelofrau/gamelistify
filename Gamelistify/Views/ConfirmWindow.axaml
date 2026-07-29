@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Gamelistify.Views.ConfirmWindow"
+        x:DataType="vm:ConfirmViewModel"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        Title="{Binding Title}"
+        Width="440"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="18">
+    <StackPanel Spacing="16">
+      <TextBlock Text="{Binding Title}" Classes="section-title" FontSize="18" />
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <Button Grid.Column="1" MinWidth="100" Classes="command-button" Click="OnNoClick" Content="No" />
+        <Button Grid.Column="2" MinWidth="100" Classes="command-button primary" Click="OnYesClick" Content="Yes" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</Window>

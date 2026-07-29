@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Gamelistify.Services;
 
 namespace Gamelistify.ViewModels;
 
@@ -30,12 +31,14 @@ public partial class ScrapeProgressViewModel : ViewModelBase
 
     public void AppendLog(string line)
     {
+        Logger.Debug("ScrapeProgress: {Line}", line);
         Dispatcher.UIThread.Post(() => LogLines.Add(line));
     }
 
     [RelayCommand(CanExecute = nameof(CanCancel))]
     private void Cancel()
     {
+        Logger.Debug("ScrapeProgress cancel requested");
         _cts?.Cancel();
         Status = "Cancellation requested...";
         CanCancel = false;

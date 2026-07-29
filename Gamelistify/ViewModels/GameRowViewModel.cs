@@ -1,4 +1,5 @@
 using Gamelistify.Models;
+using Gamelistify.Services;
 
 namespace Gamelistify.ViewModels;
 
@@ -6,6 +7,7 @@ public sealed class GameRowViewModel
 {
     public GameRowViewModel(GamelistEntry entry)
     {
+        Logger.Debug("GameRowViewModel created for {EntryPath}", entry.Path);
         Entry = entry;
     }
 

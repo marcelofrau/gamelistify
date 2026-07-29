@@ -9,8 +9,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Opened += (_, _) => Logger.Information("MainWindow opened");
-        Closing += (_, _) => Logger.Information("MainWindow closing");
+        Opened += (_, _) => Logger.Information("MainWindow opened at {Time}", DateTime.Now);
+        Closing += (_, _) => Logger.Information("MainWindow closing at {Time}", DateTime.Now);
     }
 
     private void OnEntriesSelectionChanged(object? sender, SelectionChangedEventArgs e)

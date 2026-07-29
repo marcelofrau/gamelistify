@@ -124,6 +124,22 @@ public partial class App : Application
                 return updated;
             };
 
+            mainViewModel.ConfirmAsync = async (title, message) =>
+            {
+                Logger.Information("Showing confirmation dialog: {Title}", title);
+                var confirmWindow = new ConfirmWindow
+                {
+                    DataContext = new ConfirmViewModel
+                    {
+                        Title = title,
+                        Message = message,
+                    },
+                };
+                var result = await confirmWindow.ShowDialog<bool>(mainWindow);
+                Logger.Debug("Confirmation result: {Result}", result);
+                return result;
+            };
+
             mainViewModel.ReviewScannedRomsAsync = async (items, directory) =>
             {
                 Logger.Information("Showing Scan ROMs review window with {Count} candidate entries", items.Count);

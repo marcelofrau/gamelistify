@@ -20,8 +20,18 @@
         </ListBox.ItemTemplate>
       </ListBox>
       <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-        <Button Classes="command-button" Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" ToolTip.Tip="Cancel the current scrape operation" />
-        <Button Classes="command-button primary" Content="Close" IsEnabled="{Binding CanClose}" Click="OnCloseClick" ToolTip.Tip="Close progress view and refresh list" />
+        <Button Classes="command-button" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" ToolTip.Tip="Cancel the current scrape operation">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <TextBlock Text="Cancel" />
+          </StackPanel>
+        </Button>
+        <Button Classes="command-button primary" IsEnabled="{Binding CanClose}" Click="OnCloseClick" ToolTip.Tip="Close progress view and refresh list">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <TextBlock Text="Close" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Grid>
   </Border>

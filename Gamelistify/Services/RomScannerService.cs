@@ -10,6 +10,7 @@ public sealed class RomScannerService
         var normalizedExtensions = (extensions ?? MetadataDefinitions.DefaultRomExtensions)
             .Select(static extension => extension.ToLowerInvariant())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        Logger.Verbose("ROM scan using {Count} extensions: {Extensions}", normalizedExtensions.Count, string.Join(", ", normalizedExtensions));
 
         var results = new List<ScannedRom>();
         ScanDirectory(directory, directory, normalizedExtensions, results);
@@ -19,11 +20,13 @@ public sealed class RomScannerService
 
     public static IReadOnlyList<ScannedRom> FindMissingEntries(IEnumerable<ScannedRom> scannedRoms, GamelistDocument gamelist)
     {
+        var scannedList = scannedRoms.ToList();
+        Logger.Verbose("FindMissingEntries: {ScannedCount} scanned, {ExistingCount} existing", scannedList.Count, gamelist.Entries.Count);
         var existingPaths = gamelist.Entries
             .Select(static entry => entry.Path)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var missing = scannedRoms.Where(rom => !existingPaths.Contains(rom.RelativePath)).ToList();
+        var missing = scannedList.Where(rom => !existingPaths.Contains(rom.RelativePath)).ToList();
         Logger.Information("ROM diff completed. Existing entries: {ExistingCount}, Missing entries: {MissingCount}", existingPaths.Count, missing.Count);
         return missing;
     }

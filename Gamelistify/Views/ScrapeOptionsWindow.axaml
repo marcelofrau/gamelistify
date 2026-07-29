@@ -21,8 +21,18 @@
       </Grid>
       <TextBlock Grid.Row="3" Classes="muted" Text="Credentials and binary path are read from application settings." TextWrapping="Wrap" />
       <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-        <Button Classes="command-button primary" Content="Start" Command="{Binding AcceptCommand}" Click="OnStartClick" ToolTip.Tip="Begin scraping with these options" />
-        <Button Classes="command-button" Content="Cancel" Click="OnCancelClick" ToolTip.Tip="Cancel and go back" />
+        <Button Classes="command-button primary" Command="{Binding AcceptCommand}" Click="OnStartClick" ToolTip.Tip="Begin scraping with these options">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Path Classes="dialog-icon" Data="{StaticResource IconPlay}" />
+            <TextBlock Text="Start" />
+          </StackPanel>
+        </Button>
+        <Button Classes="command-button" Click="OnCancelClick" ToolTip.Tip="Cancel and go back">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <TextBlock Text="Cancel" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Grid>
   </Border>

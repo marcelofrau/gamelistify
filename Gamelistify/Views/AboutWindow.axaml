@@ -44,7 +44,12 @@
         </StackPanel>
       </Border>
 
-      <Button Grid.Row="5" HorizontalAlignment="Right" MinWidth="120" Classes="command-button primary" Content="Close" Click="OnCloseClick" ToolTip.Tip="Close the About window" />
+      <Button Grid.Row="5" HorizontalAlignment="Right" MinWidth="120" Classes="command-button primary" Click="OnCloseClick" ToolTip.Tip="Close the About window">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/AboutWindow/aboutwindow-close-32.png" />
+          <TextBlock Text="Close" />
+        </StackPanel>
+      </Button>
     </Grid>
   </Border>
 </Window>

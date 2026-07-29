@@ -10,9 +10,16 @@ Initial product foundation implemented.
 
 Current state:
 
-- core XML domain services in place
-- desktop shell, detail pane, settings, and scan workflow working
-- scrape workflow wired with progress and cancel support
+- core XML domain services in place (load, save, backup)
+- desktop shell with searchable grid, resizable detail pane
+- full editing workflow (single-entry, bulk actions, dirty-state, recent files)
+- ROM scan workflow (detect missing entries, review, adopt)
+- scrape workflow with progress, cancel, and live output
+- star rating control with clickable 5-star UI
+- confirmation dialogs for destructive actions
+- settings window with runtime log level switching
+- Quick Tips green flyout
+- toolbar icons from personal icons8 set
 - release/versioning/documentation foundation in place
 
 ## Stack

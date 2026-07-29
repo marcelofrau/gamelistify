@@ -19,6 +19,7 @@ public partial class AboutWindow : Window
 
     private void OnCloseClick(object? sender, RoutedEventArgs e)
     {
+        Logger.Debug("AboutWindow close button clicked");
         Close();
     }
 

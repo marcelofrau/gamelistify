@@ -27,7 +27,7 @@ public partial class MainViewModel : ViewModelBase
     private string _windowTitle = $"{ProjectInfo.ProjectName} {BuildInfo.DisplayVersion}";
 
     [ObservableProperty]
-    private string _detailTitle = "No selection";
+    private string _detailTitle = string.Empty;
 
     [ObservableProperty]
     private string _detailPath = string.Empty;
@@ -81,6 +81,41 @@ public partial class MainViewModel : ViewModelBase
     private bool _detailHiddenEdit;
 
     [ObservableProperty]
+    private string _detailPublisher = string.Empty;
+
+    [ObservableProperty]
+    private string _detailPlayers = string.Empty;
+
+    [ObservableProperty]
+    private string _detailRating = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Star1Filled))]
+    [NotifyPropertyChangedFor(nameof(Star2Filled))]
+    [NotifyPropertyChangedFor(nameof(Star3Filled))]
+    [NotifyPropertyChangedFor(nameof(Star4Filled))]
+    [NotifyPropertyChangedFor(nameof(Star5Filled))]
+    private double _detailRatingValue;
+
+    public bool Star1Filled => DetailRatingValue >= 1.0;
+    public bool Star2Filled => DetailRatingValue >= 2.0;
+    public bool Star3Filled => DetailRatingValue >= 3.0;
+    public bool Star4Filled => DetailRatingValue >= 4.0;
+    public bool Star5Filled => DetailRatingValue >= 5.0;
+
+    [ObservableProperty]
+    private string _detailVotes = string.Empty;
+
+    [ObservableProperty]
+    private string _detailReleaseDate = string.Empty;
+
+    [ObservableProperty]
+    private string _detailLastPlayed = string.Empty;
+
+    [ObservableProperty]
+    private string _detailPlayCount = string.Empty;
+
+    [ObservableProperty]
     private bool _isDirty;
 
     [ObservableProperty]
@@ -89,6 +124,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasDetailImage))]
     [NotifyPropertyChangedFor(nameof(ShowPreviewPlaceholder))]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
     private GameRowViewModel? _selectedEntry;
 
     public ObservableCollection<GameRowViewModel> VisibleEntries { get; } = [];
@@ -109,7 +145,46 @@ public partial class MainViewModel : ViewModelBase
 
     public Func<ScrapeProgressViewModel, Task>? ShowScrapeProgressAsync { get; set; }
 
+    public Func<string, string, Task<bool>>? ConfirmAsync { get; set; }
+
     public bool HasLoadedDocument => _loadedDocument is not null;
+
+    public bool HasSelection => SelectedEntry is not null;
+
+    public string[] QuickTipsList { get; } =
+    [
+        "Use Ctrl+O to open a gamelist.xml file.",
+        "Use Ctrl+S to save changes back to the gamelist.xml.",
+        "Select entries in the grid to edit metadata in the right panel.",
+        "Use the toolbar buttons to hide, favorite, or bulk-scrape entries.",
+        "Image preview shows the first available matching media file.",
+        "Filter entries using the text search bar above the grid.",
+        "Column visibility checkboxes let you customize the grid view.",
+        "The Info tab shows raw metadata from the gamelist.xml entry.",
+        "Changes are tracked — the save icon highlights when dirty.",
+        "Backups are created automatically before each save."
+    ];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentTip))]
+    [NotifyPropertyChangedFor(nameof(TipCounter))]
+    private int _currentTipIndex;
+
+    public string CurrentTip => QuickTipsList[CurrentTipIndex];
+
+    public string TipCounter => $"{CurrentTipIndex + 1} / {QuickTipsList.Length}";
+
+    [RelayCommand]
+    private void PreviousTip()
+    {
+        CurrentTipIndex = CurrentTipIndex > 0 ? CurrentTipIndex - 1 : QuickTipsList.Length - 1;
+    }
+
+    [RelayCommand]
+    private void NextTip()
+    {
+        CurrentTipIndex = CurrentTipIndex < QuickTipsList.Length - 1 ? CurrentTipIndex + 1 : 0;
+    }
 
     public bool HasDetailImage => DetailImage is not null;
 
@@ -146,6 +221,41 @@ public partial class MainViewModel : ViewModelBase
     partial void OnDetailFavoriteEditChanged(bool value) => ApplyEditorChanges();
 
     partial void OnDetailHiddenEditChanged(bool value) => ApplyEditorChanges();
+
+    partial void OnDetailPublisherChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailPlayersChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailRatingChanged(string value)
+    {
+        if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var d))
+            DetailRatingValue = double.Clamp(d, 0, 5);
+        else
+            DetailRatingValue = 0;
+        ApplyEditorChanges();
+    }
+
+    partial void OnDetailRatingValueChanged(double value)
+    {
+        var formatted = value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+        if (DetailRating != formatted)
+            DetailRating = formatted;
+    }
+
+    [RelayCommand]
+    private void SetRating(string? value)
+    {
+        if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var d))
+            DetailRatingValue = double.Clamp(d, 0, 5);
+    }
+
+    partial void OnDetailVotesChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailReleaseDateChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailLastPlayedChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailPlayCountChanged(string value) => ApplyEditorChanges();
 
     partial void OnShowNameColumnChanged(bool value) => PersistColumnVisibility(columns => columns.Name = value);
 
@@ -190,6 +300,18 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(CanSave))]
+    private async Task ReloadAsync()
+    {
+        Logger.Information("Discard requested — reloading current document");
+        if (_loadedDocument?.SourcePath is null)
+            return;
+        if (ConfirmAsync is not null && !await ConfirmAsync("Discard changes", "Reload the file from disk? All unsaved changes will be lost."))
+            return;
+        await LoadFileAsync(_loadedDocument.SourcePath);
+        StatusText = "Changes discarded. Reloaded from disk.";
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task SaveAsync()
     {
         if (_loadedDocument is null || string.IsNullOrWhiteSpace(_loadedDocument.SourcePath))
@@ -203,6 +325,46 @@ public partial class MainViewModel : ViewModelBase
     }
 
     private bool CanSave() => HasLoadedDocument;
+
+    private bool CanRemove() => HasSelection;
+
+    [RelayCommand(CanExecute = nameof(CanRemove))]
+    private async Task RemoveEntryAsync()
+    {
+        if (SelectedEntry is null) return;
+        if (ConfirmAsync is not null && !await ConfirmAsync("Remove entry", $"Remove \"{SelectedEntry.Entry.Name}\" from the gamelist?"))
+            return;
+
+        Logger.Information("Removing entry {Name} from gamelist", SelectedEntry.Entry.Name);
+        _allEntries.Remove(SelectedEntry);
+        _loadedDocument?.RemoveEntry(SelectedEntry.Entry);
+        SelectedEntry = null;
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = "Entry removed.";
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
+    private async Task RemoveSelectedEntriesAsync()
+    {
+        if (_selectedEntries.Count == 0) return;
+        if (ConfirmAsync is not null && !await ConfirmAsync("Remove selected", $"Remove {_selectedEntries.Count} selected entr{( _selectedEntries.Count == 1 ? "y" : "ies")} from the gamelist?"))
+            return;
+
+        var count = _selectedEntries.Count;
+        Logger.Information("Removing {Count} selected entries from gamelist", count);
+        foreach (var row in _selectedEntries.ToList())
+        {
+            _allEntries.Remove(row);
+            _loadedDocument?.RemoveEntry(row.Entry);
+        }
+        _selectedEntries.Clear();
+        ApplySearchFilter();
+        SelectedEntry = null;
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = $"{count} entr{(count == 1 ? "y" : "ies")} removed.";
+    }
 
     [RelayCommand]
     private async Task ScanRomsAsync()
@@ -268,7 +430,7 @@ public partial class MainViewModel : ViewModelBase
         StatusText = $"Added {approved.Count} ROM entries from scan.";
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
     private async Task ScrapeSelectedAsync()
     {
         if (_loadedDocument is null)
@@ -312,7 +474,7 @@ public partial class MainViewModel : ViewModelBase
         StatusText = $"Completed scraping for {selectedGames.Count} selected entries.";
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task ScrapeAllAsync()
     {
         if (_loadedDocument is null)
@@ -452,22 +614,29 @@ public partial class MainViewModel : ViewModelBase
 
     private void UpdateDetailPane(GameRowViewModel? row)
     {
+        Logger.Verbose("UpdateDetailPane for {Row}", row?.Name ?? "(null)");
         DetailImage?.Dispose();
         DetailImage = null;
         _suppressEditorApply = true;
 
         if (row is null)
         {
-            DetailTitle = "No selection";
+            DetailTitle = string.Empty;
             DetailPath = string.Empty;
-            DetailSummary = "Select an entry to inspect metadata and preview image assets.";
-            DetailImageStatus = "No image loaded.";
+            DetailSummary = string.Empty;
             DetailNameEdit = string.Empty;
             DetailGenreEdit = string.Empty;
             DetailDeveloperEdit = string.Empty;
             DetailDescriptionEdit = string.Empty;
             DetailFavoriteEdit = false;
             DetailHiddenEdit = false;
+            DetailPublisher = string.Empty;
+            DetailPlayers = string.Empty;
+            DetailRating = string.Empty;
+            DetailVotes = string.Empty;
+            DetailReleaseDate = string.Empty;
+            DetailLastPlayed = string.Empty;
+            DetailPlayCount = string.Empty;
             _suppressEditorApply = false;
             return;
         }
@@ -481,13 +650,17 @@ public partial class MainViewModel : ViewModelBase
         DetailDescriptionEdit = row.Description;
         DetailFavoriteEdit = row.Favorite;
         DetailHiddenEdit = row.Hidden;
+        DetailPublisher = row.Entry.GetField("publisher") ?? string.Empty;
+        DetailPlayers = row.Entry.GetField("players") ?? string.Empty;
+        DetailRating = row.Entry.GetField("rating") ?? string.Empty;
+        DetailVotes = row.Entry.GetField("votes") ?? string.Empty;
+        DetailReleaseDate = row.Entry.GetField("releasedate") ?? string.Empty;
+        DetailLastPlayed = row.Entry.GetField("lastplayed") ?? string.Empty;
+        DetailPlayCount = row.Entry.GetField("playcount") ?? string.Empty;
         _suppressEditorApply = false;
 
         if (_loadedDocument is null)
-        {
-            DetailImageStatus = "No document loaded.";
             return;
-        }
 
         var resolvedImagePath = row.ImagePath is null
             ? null
@@ -495,10 +668,12 @@ public partial class MainViewModel : ViewModelBase
 
         if (resolvedImagePath is null)
         {
+            Logger.Verbose("No image for {Entry} (no mapped path)", row.Name);
             DetailImageStatus = "No mapped image found for current selection.";
             return;
         }
 
+        Logger.Verbose("Loading preview image {Image}", resolvedImagePath);
         using var stream = File.OpenRead(resolvedImagePath);
         DetailImage = new Bitmap(stream);
         DetailImageStatus = $"Preview source: {Path.GetFileName(resolvedImagePath)}";
@@ -512,10 +687,19 @@ public partial class MainViewModel : ViewModelBase
         if (_loadedDocument is null || SelectedEntry?.Entry is null)
             return;
 
+        Logger.Verbose("Editor changes applied to {Entry}", SelectedEntry.Name);
+
         SelectedEntry.Entry.SetField("name", DetailNameEdit.Trim());
         SelectedEntry.Entry.SetField("genre", DetailGenreEdit.Trim());
         SelectedEntry.Entry.SetField("developer", DetailDeveloperEdit.Trim());
         SelectedEntry.Entry.SetField("desc", DetailDescriptionEdit.Trim());
+        SelectedEntry.Entry.SetField("publisher", DetailPublisher.Trim());
+        SelectedEntry.Entry.SetField("players", DetailPlayers.Trim());
+        SelectedEntry.Entry.SetField("rating", DetailRating.Trim());
+        SelectedEntry.Entry.SetField("votes", DetailVotes.Trim());
+        SelectedEntry.Entry.SetField("releasedate", DetailReleaseDate.Trim());
+        SelectedEntry.Entry.SetField("lastplayed", DetailLastPlayed.Trim());
+        SelectedEntry.Entry.SetField("playcount", DetailPlayCount.Trim());
         SelectedEntry.Entry.SetBooleanField("favorite", DetailFavoriteEdit);
         SelectedEntry.Entry.SetBooleanField("hidden", DetailHiddenEdit);
 
@@ -545,6 +729,8 @@ public partial class MainViewModel : ViewModelBase
         UnhideSelectedCommand.NotifyCanExecuteChanged();
         FavoriteSelectedCommand.NotifyCanExecuteChanged();
         UnfavoriteSelectedCommand.NotifyCanExecuteChanged();
+        RemoveSelectedEntriesCommand.NotifyCanExecuteChanged();
+        ScrapeSelectedCommand.NotifyCanExecuteChanged();
     }
 
     private void RegisterRecentFile(string filePath)
@@ -591,6 +777,9 @@ public partial class MainViewModel : ViewModelBase
         UnhideSelectedCommand.NotifyCanExecuteChanged();
         FavoriteSelectedCommand.NotifyCanExecuteChanged();
         UnfavoriteSelectedCommand.NotifyCanExecuteChanged();
+        RemoveSelectedEntriesCommand.NotifyCanExecuteChanged();
+        ScrapeSelectedCommand.NotifyCanExecuteChanged();
+        ScrapeAllCommand.NotifyCanExecuteChanged();
     }
 
     private void SyncRecentFiles()
@@ -701,6 +890,7 @@ public partial class MainViewModel : ViewModelBase
         if (_selectedEntries.Count == 0)
             return;
 
+        Logger.Information("Bulk action: {Field}={Value} on {Count} entries", fieldName, value, _selectedEntries.Count);
         foreach (var row in _selectedEntries)
             row.Entry.SetBooleanField(fieldName, value);
 

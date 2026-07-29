@@ -10,22 +10,22 @@ public partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
-        Opened += (_, _) => Logger.Information("SettingsWindow opened");
-        Closed += (_, _) => Logger.Information("SettingsWindow closed");
+        Opened += (_, _) => Logger.Debug("SettingsWindow opened");
+        Closed += (_, _) => Logger.Debug("SettingsWindow closed");
     }
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is SettingsViewModel viewModel && viewModel.Saved)
         {
-            Logger.Information("SettingsWindow confirmed save");
+            Logger.Debug("SettingsWindow confirmed save");
             Close(true);
         }
     }
 
     private void OnCancelClick(object? sender, RoutedEventArgs e)
     {
-        Logger.Information("SettingsWindow cancelled");
+        Logger.Debug("SettingsWindow cancelled");
         Close(false);
     }
 }

@@ -63,6 +63,7 @@ public sealed class GamelistService
     public static async Task SaveAsync(GamelistDocument document, string? destinationPath = null, bool createBackup = true, CancellationToken cancellationToken = default)
     {
         var outputPath = destinationPath ?? document.SourcePath ?? throw new InvalidOperationException("Destination path is required.");
+        Logger.Verbose("SaveAsync: {EntryCount} entries to save", document.Entries.Count);
         Logger.Information("Saving gamelist XML to {OutputPath}. Backup enabled={BackupEnabled}", outputPath, createBackup);
 
         if (createBackup && File.Exists(outputPath))

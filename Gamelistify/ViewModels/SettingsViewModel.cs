@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gamelistify.Models;
+using Gamelistify.Services;
+using Serilog.Events;
 
 namespace Gamelistify.ViewModels;
 
@@ -18,6 +20,18 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private int _imagePreviewSize = 220;
 
+    [ObservableProperty]
+    private int _selectedLogLevelIndex;
+
+    public string[] LogLevelOptions { get; } =
+    [
+        "Verbose",
+        "Debug",
+        "Information",
+        "Warning",
+        "Error"
+    ];
+
     public bool Saved { get; private set; }
 
     public void LoadFrom(AppSettings settings)
@@ -26,6 +40,16 @@ public partial class SettingsViewModel : ViewModelBase
         ScreenScraperUser = settings.ScreenScraperUser;
         ScreenScraperPassword = settings.ScreenScraperPassword;
         ImagePreviewSize = settings.ImagePreviewSize;
+
+        var current = Logger.CurrentLevelName;
+        for (int i = 0; i < LogLevelOptions.Length; i++)
+        {
+            if (LogLevelOptions[i].Equals(current, StringComparison.OrdinalIgnoreCase))
+            {
+                SelectedLogLevelIndex = i;
+                break;
+            }
+        }
     }
 
     public void ApplyTo(AppSettings settings)
@@ -39,6 +63,9 @@ public partial class SettingsViewModel : ViewModelBase
     [RelayCommand]
     private void Save()
     {
+        var levelName = LogLevelOptions[SelectedLogLevelIndex];
+        if (Enum.TryParse<LogEventLevel>(levelName, out var level))
+            Logger.SetMinimumLevel(level);
         Saved = true;
     }
 }

@@ -22,6 +22,8 @@ public sealed class MediaResolverService
         var resolved = candidatePaths
             .Select(static path => Path.GetFullPath(path))
             .FirstOrDefault(File.Exists);
+
+        Logger.Verbose("ResolveMediaPath candidates: {Candidates}", string.Join("; ", candidatePaths));
         Logger.Debug("ResolveMediaPath base={BaseDirectory} raw={RawPath} resolved={ResolvedPath}", baseDirectory, rawPath, resolved ?? "<none>");
         return resolved;
     }

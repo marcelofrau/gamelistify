@@ -66,6 +66,7 @@ public sealed class SkyscraperService
 
     public static async Task WriteCredentialsAsync(string configPath, string user, string password, CancellationToken cancellationToken = default)
     {
+        Logger.Debug("WriteCredentialsAsync target={ConfigPath}", configPath);
         var directory = Path.GetDirectoryName(configPath);
         if (!string.IsNullOrWhiteSpace(directory))
             Directory.CreateDirectory(directory);
@@ -102,6 +103,7 @@ public sealed class SkyscraperService
             startInfo.ArgumentList.Add(argument);
 
         using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+        Logger.Verbose("RunAsync: starting process with {ArgCount} arguments", command.Count - 1);
         process.Start();
 
         await using var _ = cancellationToken.Register(() =>

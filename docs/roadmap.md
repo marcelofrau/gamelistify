@@ -34,19 +34,26 @@ title: Roadmap
 
 ## Phase 3 - Editing Workflow
 
-- single-entry editing
-- bulk actions
-- dirty-state handling
-- recent files
-- settings
-- toolbar icons from personal set
-- recent file reopen flow
-- column visibility persistence
+- [x] single-entry editing
+- [x] bulk actions
+- [x] dirty-state handling
+- [x] recent files
+- [x] settings (log level, taller)
+- [x] toolbar icons from personal set
+- [x] recent file reopen flow
+- [x] column visibility persistence
+- [x] Quick Tips green flyout
+- [x] star rating control (5 clickable stars)
+- [x] confirmation dialogs (discard, remove)
+- [x] remove entry from detail view
+- [x] remove selected entries toolbar
+- [x] Serilog runtime level switching
+- [x] CanExecute wiring for toolbar buttons
 
 ## Phase 3.5 - Library Maintenance Utilities
 
-- ROM scan review dialog
-- add missing ROM entries into current document
+- [x] ROM scan review dialog
+- [x] add missing ROM entries into current document
 
 ## Phase 4 - Scraping Workflow
 

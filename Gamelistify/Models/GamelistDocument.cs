@@ -11,4 +11,6 @@ public sealed class GamelistDocument
     public string BaseDirectory => SourcePath is null
         ? string.Empty
         : Path.GetDirectoryName(SourcePath) ?? string.Empty;
+
+    public bool RemoveEntry(GamelistEntry entry) => Entries.Remove(entry);
 }

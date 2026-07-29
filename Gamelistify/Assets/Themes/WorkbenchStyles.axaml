@@ -50,13 +50,14 @@
     <Setter Property="Background" Value="#00000000" />
     <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
     <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
-    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="6,5" />
     <Setter Property="MinHeight" Value="40" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Style Selector="^:pointerover">
       <Setter Property="Background" Value="#332E2D2B" />
       <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
-      <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="^:pressed">
       <Setter Property="Background" Value="#553C3126" />
@@ -70,12 +71,29 @@
     <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccentDeep}" />
     <Setter Property="BorderThickness" Value="1" />
     <Style Selector="^:pointerover">
-      <Setter Property="Background" Value="{StaticResource WorkbenchAccentGlow}" />
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0" Color="#F5A65B" />
+            <GradientStop Offset="0.35" Color="#E88A3E" />
+            <GradientStop Offset="0.7" Color="#E07C30" />
+            <GradientStop Offset="1" Color="#C1641E" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
       <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
     </Style>
     <Style Selector="^:pressed">
-      <Setter Property="Background" Value="{StaticResource WorkbenchAccentDeep}" />
-      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccent}" />
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0" Color="#8A3E0A" />
+            <GradientStop Offset="0.5" Color="#BA5A14" />
+            <GradientStop Offset="1" Color="#C1641E" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderBrush" Value="{StaticResource WorkbenchAccentDeep}" />
     </Style>
   </Style>
 
@@ -88,16 +106,17 @@
     <Setter Property="Padding" Value="6,5" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
+        <Border Name="rootBorder"
+                Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding CornerRadius}">
-          <ContentPresenter Content="{TemplateBinding Content}"
+          <ContentPresenter Name="contentPresenter"
+                            Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
                             Padding="{TemplateBinding Padding}"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                            RecognizesAccessKey="True" />
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
         </Border>
       </ControlTemplate>
     </Setter>
@@ -130,9 +149,23 @@
 
   <Style Selector="Button.command-button.toolbar-button:disabled">
     <Setter Property="Opacity" Value="1" />
-    <Setter Property="Background" Value="#D97A30" />
-    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Background" Value="{StaticResource WorkbenchToolbarBg}" />
+    <Setter Property="BorderBrush" Value="#00000000" />
     <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button:disabled /template/ Border#rootBorder">
+    <Setter Property="Background" Value="{StaticResource WorkbenchToolbarBg}" />
+    <Setter Property="BorderBrush" Value="#00000000" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button:disabled Image.toolbar-icon">
+    <Setter Property="Opacity" Value="0.35" />
+  </Style>
+
+  <Style Selector="Button.command-button.toolbar-button:disabled TextBlock.toolbar-label">
+    <Setter Property="Opacity" Value="0.45" />
   </Style>
 
   <Style Selector="Button.command-button.toolbar-button TextBlock.toolbar-label">
@@ -212,18 +245,26 @@
     <Setter Property="Background" Value="Transparent" />
   </Style>
 
-  <Style Selector="Button:disabled">
+  <Style Selector="Button.command-button:disabled">
     <Setter Property="Background" Value="{StaticResource WorkbenchDisabledBg}" />
     <Setter Property="Foreground" Value="{StaticResource WorkbenchDisabledFg}" />
-    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorder}" />
   </Style>
 
   <Style Selector="Button.command-button:disabled Image.toolbar-icon">
     <Setter Property="Opacity" Value="0.3" />
   </Style>
 
+  <Style Selector="Button.command-button:disabled Image.dialog-icon">
+    <Setter Property="Opacity" Value="0.25" />
+  </Style>
+
   <Style Selector="Button.command-button:disabled TextBlock.toolbar-label">
     <Setter Property="Opacity" Value="0.4" />
+  </Style>
+
+  <Style Selector="Button.command-button.primary Path.dialog-icon">
+    <Setter Property="Stroke" Value="#22160E" />
   </Style>
 
   <Style Selector="Button.command-button.primary:disabled">
@@ -236,10 +277,37 @@
     <Setter Property="Opacity" Value="0.25" />
   </Style>
 
+  <Style Selector="Button.command-button.primary:disabled Image.dialog-icon">
+    <Setter Property="Opacity" Value="0.2" />
+  </Style>
+
+  <Style Selector="Image.dialog-icon">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="Path.dialog-icon">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Stretch" Value="Uniform" />
+    <Setter Property="Stroke" Value="{StaticResource WorkbenchText}" />
+    <Setter Property="StrokeThickness" Value="1.5" />
+    <Setter Property="StrokeLineCap" Value="Round" />
+    <Setter Property="StrokeJoin" Value="Round" />
+  </Style>
+
   <Style Selector="Image.preview-image">
     <Setter Property="Stretch" Value="Uniform" />
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="MaxHeight" Value="170" />
+  </Style>
+
+  <Style Selector="FlyoutPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
   </Style>
 </Styles>
