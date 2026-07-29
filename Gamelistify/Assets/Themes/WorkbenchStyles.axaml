@@ -12,6 +12,7 @@
     <Setter Property="BorderBrush" Value="#1E3323" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="10,6" />
+    <Setter Property="FontSize" Value="13" />
   </Style>
 
   <Style Selector="Border.panel">
@@ -127,7 +128,7 @@
   </Style>
 
   <Style Selector="Button.command-button.toolbar-button:disabled">
-    <Setter Property="Opacity" Value="0.6" />
+    <Setter Property="Opacity" Value="1" />
     <Setter Property="Background" Value="#00000000" />
     <Setter Property="BorderBrush" Value="#00000000" />
     <Setter Property="BorderThickness" Value="0" />
