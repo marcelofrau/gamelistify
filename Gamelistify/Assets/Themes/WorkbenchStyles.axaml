@@ -7,9 +7,9 @@
   </Style>
 
   <Style Selector="ToolTip">
-    <Setter Property="Background" Value="#1E3323" />
-    <Setter Property="Foreground" Value="{StaticResource WorkbenchText}" />
-    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchSuccess}" />
+    <Setter Property="Background" Value="{StaticResource WorkbenchSuccess}" />
+    <Setter Property="Foreground" Value="#1A1A1A" />
+    <Setter Property="BorderBrush" Value="#1E3323" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="10,6" />
   </Style>
