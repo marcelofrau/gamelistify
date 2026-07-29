@@ -13,6 +13,7 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="10,6" />
     <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontFamily" Value="fonts:SpaceGrotesk#Space Grotesk" />
   </Style>
 
   <Style Selector="Border.panel">
