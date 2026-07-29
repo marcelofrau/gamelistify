@@ -84,6 +84,21 @@
     <Setter Property="BorderBrush" Value="#00000000" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="6,5" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
     <Style Selector="^:pointerover">
       <Setter Property="Background">
         <Setter.Value>
@@ -112,7 +127,7 @@
   </Style>
 
   <Style Selector="Button.command-button.toolbar-button:disabled">
-    <Setter Property="Opacity" Value="0.75" />
+    <Setter Property="Opacity" Value="0.6" />
     <Setter Property="Background" Value="#00000000" />
     <Setter Property="BorderBrush" Value="#00000000" />
     <Setter Property="BorderThickness" Value="0" />
