@@ -8,7 +8,7 @@
 
   <Style Selector="ToolTip">
     <Setter Property="Background" Value="{StaticResource WorkbenchSuccess}" />
-    <Setter Property="Foreground" Value="#000000" />
+    <Setter Property="Foreground" Value="#222222" />
     <Setter Property="BorderBrush" Value="#1E3323" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="10,6" />
@@ -130,16 +130,9 @@
 
   <Style Selector="Button.command-button.toolbar-button:disabled">
     <Setter Property="Opacity" Value="1" />
+    <Setter Property="Background" Value="#D97A30" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Background">
-      <Setter.Value>
-        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-          <GradientStop Offset="0" Color="#E88A3E" />
-          <GradientStop Offset="1" Color="#C96E22" />
-        </LinearGradientBrush>
-      </Setter.Value>
-    </Setter>
   </Style>
 
   <Style Selector="Button.command-button.toolbar-button TextBlock.toolbar-label">
