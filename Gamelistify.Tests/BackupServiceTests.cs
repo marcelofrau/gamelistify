@@ -1,3 +1,4 @@
+using System.Globalization;
 using Gamelistify.Services;
 
 namespace Gamelistify.Tests;
@@ -18,7 +19,8 @@ public sealed class BackupServiceTests
             Assert.True(File.Exists(backupPath));
             Assert.Equal(Path.Combine(tempDirectory, "gamelists_backup", "gamelist.2026-07-22T15-30-10.000.xml.bak"), backupPath);
             Assert.True(Directory.Exists(Path.Combine(tempDirectory, "gamelists_backup")));
-            Assert.True((File.GetAttributes(Path.Combine(tempDirectory, "gamelists_backup")) & FileAttributes.Hidden) != 0);
+            if (OperatingSystem.IsWindows())
+                Assert.True((File.GetAttributes(Path.Combine(tempDirectory, "gamelists_backup")) & FileAttributes.Hidden) != 0);
         }
         finally
         {
@@ -44,7 +46,8 @@ public sealed class BackupServiceTests
             Assert.Equal(newPath, backups[0].FilePath);
             Assert.Equal(oldPath, backups[1].FilePath);
             Assert.Equal("Jul 23, 2026 09:05:00", backups[0].DisplayTime);
-            Assert.Equal(DateTimeOffset.Parse("2026-07-22T15:30:10"), backups[1].Timestamp);
+            Assert.Equal("2026-07-23 09:05:00", backups[0].Timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+            Assert.Equal("2026-07-22 15:30:10", backups[1].Timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
         }
         finally
         {

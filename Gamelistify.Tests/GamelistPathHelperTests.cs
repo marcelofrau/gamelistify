@@ -15,17 +15,18 @@ public sealed class GamelistPathHelperTests
     }
 
     [Theory]
-    [InlineData("./roms/game.zip", @"C:\base\roms\game.zip")]
-    [InlineData("roms/game.zip", @"C:\base\roms\game.zip")]
-    [InlineData("game.zip", @"C:\base\game.zip")]
-    [InlineData("sub\\nested.zip", @"C:\base\sub\nested.zip")]
-    public void ResolveToAbsolutePath_resolves_relative_to_base(string input, string expected)
+    [InlineData("./roms/game.zip")]
+    [InlineData("roms/game.zip")]
+    [InlineData("game.zip")]
+    [InlineData("sub\\nested.zip")]
+    public void ResolveToAbsolutePath_resolves_relative_to_base(string input)
     {
         const string baseDirectory = @"C:\base";
 
+        var expected = Path.GetFullPath(Path.Combine(baseDirectory, input.Replace('\\', '/')));
         var result = GamelistPathHelper.ResolveToAbsolutePath(input, baseDirectory);
 
-        Assert.Equal(Path.GetFullPath(expected), result);
+        Assert.Equal(expected, result);
     }
 
     [Fact]
