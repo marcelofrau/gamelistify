@@ -1,0 +1,45 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./build/build-release.ps1 -Version "${{ github.ref_name }}" -Rid "${{ matrix.rid }}"
+
+      - name: Publish archive (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: chmod +x ./build/build-release.sh && ./build/build-release.sh "${{ github.ref_name }}" "${{ matrix.rid }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: build/dist/*.zip

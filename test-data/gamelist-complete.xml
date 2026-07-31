@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<gameList>
+    <game id="1" source="user">
+        <path>./roms/SuperMarioBros.nes</path>
+        <name>Super Mario Bros.</name>
+        <desc>Mario and Luigi save Princess Peach from Bowser.</desc>
+        <genre>Platformer</genre>
+        <developer>Nintendo</developer>
+        <publisher>Nintendo</publisher>
+        <players>2</players>
+        <rating>0.92</rating>
+        <votes>1500</votes>
+        <releasedate>19850913T000000</releasedate>
+        <lastplayed>20260520T140000</lastplayed>
+        <playcount>42</playcount>
+        <image>./images/SuperMarioBros.png</image>
+        <thumbnail>./thumbnails/SuperMarioBros.png</thumbnail>
+        <video>./videos/SuperMarioBros.mp4</video>
+        <marquee>./marquees/SuperMarioBros.png</marquee>
+    </game>
+    <game id="4" source="user">
+        <path>./roms/Metroid.nes</path>
+        <name>Metroid</name>
+        <desc>Samus Aran explores planet Zebes to defeat Mother Brain.</desc>
+        <genre>Action-Adventure</genre>
+        <developer>Nintendo R&amp;D1</developer>
+        <publisher>Nintendo</publisher>
+        <players>1</players>
+        <rating>0.85</rating>
+        <votes>980</votes>
+        <releasedate>19860806T000000</releasedate>
+        <lastplayed>20260715T093000</lastplayed>
+        <playcount>8</playcount>
+        <image>./images/Metroid.png</image>
+        <thumbnail>./thumbnails/Metroid.png</thumbnail>
+        <video>./videos/Metroid.mp4</video>
+    </game>
+    <game id="7" source="user">
+        <path>./roms/Castlevania.nes</path>
+        <name>Castlevania</name>
+        <desc>Simon Belmont fights Dracula and his minions.</desc>
+        <genre>Action-Platformer</genre>
+        <developer>Konami</developer>
+        <publisher>Konami</publisher>
+        <players>1</players>
+        <rating>0.82</rating>
+        <votes>1100</votes>
+        <releasedate>19860926T000000</releasedate>
+        <image>./images/Castlevania.png</image>
+        <thumbnail>./thumbnails/Castlevania.png</thumbnail>
+    </game>
+    <game id="10" source="user">
+        <path>./roms/FinalFantasy.nes</path>
+        <name>Final Fantasy</name>
+        <desc>Four Warriors of Light restore the crystals and save the world.</desc>
+        <genre>RPG</genre>
+        <developer>Square</developer>
+        <publisher>Square</publisher>
+        <players>4</players>
+        <rating>0.88</rating>
+        <votes>2000</votes>
+        <releasedate>19871218T000000</releasedate>
+        <lastplayed>20260701T163000</lastplayed>
+        <playcount>5</playcount>
+        <image>./images/FinalFantasy.png</image>
+    </game>
+    <game id="12" source="user">
+        <path>./roms/MegaMan2.nes</path>
+        <name>Mega Man 2</name>
+        <desc>Mega Man must defeat the eight Robot Masters and Dr. Wily.</desc>
+        <genre>Action-Platformer</genre>
+        <developer>Capcom</developer>
+        <publisher>Capcom</publisher>
+        <players>1</players>
+        <rating>0.91</rating>
+        <votes>1800</votes>
+        <releasedate>19881201T000000</releasedate>
+        <lastplayed>20250610T110000</lastplayed>
+        <playcount>12</playcount>
+        <image>./images/MegaMan2.png</image>
+        <thumbnail>./thumbnails/MegaMan2.png</thumbnail>
+        <video>./videos/MegaMan2.mp4</video>
+        <marquee>./marquees/MegaMan2.png</marquee>
+    </game>
+    <game id="15" source="user">
+        <path>./roms/Contra.nes</path>
+        <name>Contra</name>
+        <desc>Elite soldiers battle Red Falcon and alien forces.</desc>
+        <genre>Run-and-Gun</genre>
+        <developer>Konami</developer>
+        <publisher>Konami</publisher>
+        <players>2</players>
+        <rating>0.87</rating>
+        <votes>1350</votes>
+        <releasedate>19880209T000000</releasedate>
+        <playcount>25</playcount>
+        <image>./images/Contra.png</image>
+    </game>
+</gameList>

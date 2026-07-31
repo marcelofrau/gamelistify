@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<gameList>
+    <game id="1" source="user">
+        <path>./roms/SuperMarioWorld.sfc</path>
+        <name>Super Mario World</name>
+        <desc>Mario must save the dinosaur world from Bowser.</desc>
+        <rating>0.9</rating>
+        <image>./images/SuperMarioWorld.png</image>
+    </game>
+    <game id="2" source="user">
+        <path>./roms/ZeldaALinkToThePast.sfc</path>
+        <name>The Legend of Zelda: A Link to the Past</name>
+        <desc>Link must rescue the maidens and defeat Ganon.</desc>
+        <rating>0.95</rating>
+        <image>./images/ZeldaALinkToThePast.png</image>
+    </game>
+    <game id="3" source="user">
+        <path>./roms/MegaManX.sfc</path>
+        <name>Mega Man X</name>
+        <desc>Maverick hunter X battles against Sigma.</desc>
+        <rating>0.85</rating>
+        <image>./images/MegaManX.png</image>
+    </game>
+</gameList>

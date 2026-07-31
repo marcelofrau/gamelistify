@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<gameList>
+    <folder>
+        <path>./roms/Favorites</path>
+        <name>Favorites</name>
+        <image>./images/folder.png</image>
+    </folder>
+    <game id="1" source="user">
+        <path>./roms/Chrono+Trigger.sfc</path>
+        <name>Chrono Trigger + &quot;Dream Team&quot;</name>
+        <desc>Time-travel RPG with special chars: &lt;bold&gt;legendary&lt;/bold&gt;</desc>
+        <rating>0</rating>
+        <image>./images/Chrono Trigger.png</image>
+    </game>
+    <game id="2" source="user">
+        <path>./roms/EmptyFieldsTest.sfc</path>
+        <name>Empty Fields Test</name>
+        <desc></desc>
+        <rating></rating>
+        <genre></genre>
+    </game>
+    <game id="3" source="user">
+        <path>./roms/NoRating.sfc</path>
+        <name>No Rating Game</name>
+        <desc>This entry has no rating element at all.</desc>
+    </game>
+    <game id="4" source="user">
+        <path>./roms/FullRating.sfc</path>
+        <name>Full Rating Test</name>
+        <desc>Testing max rating value.</desc>
+        <rating>1</rating>
+    </game>
+    <game id="5" source="user">
+        <path>./roms/invalid/chars/\u0000null.sfc</path>
+        <name>Unicode • Test ✓ ñ á é ü 😊</name>
+        <desc>Entry with unicode characters in name and path.</desc>
+        <rating>0.75</rating>
+    </game>
+    <game id="6" source="user">
+        <path>./roms/HiddenGame.nes</path>
+        <name>Hidden Test Game</name>
+        <desc>This game might be hidden.</desc>
+        <hidden>true</hidden>
+        <favorite>true</favorite>
+    </game>
+</gameList>
