@@ -13,6 +13,11 @@
         MinWidth="1100"
         MinHeight="720">
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenCommand}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+    </Window.KeyBindings>
+
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -103,7 +108,7 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="16,12,16,0">
             <Grid>
-                <TextBox Text="{Binding SearchText}" PlaceholderText="Search by name, genre, developer..." Padding="32,0,0,0" />
+                <TextBox x:Name="SearchBox" Text="{Binding SearchText}" PlaceholderText="Search by name, genre, developer..." Padding="32,0,0,0" />
                 <Path Data="{StaticResource IconSearch}"
                       Width="16" Height="16"
                       Fill="{StaticResource WorkbenchText}"
@@ -114,11 +119,10 @@
                       IsHitTestVisible="False"
                       Stretch="Uniform" />
             </Grid>
-            <ComboBox Grid.Column="1" SelectedIndex="0" Width="160">
-                <ComboBoxItem Content="All Entries" />
-                <ComboBoxItem Content="Games" />
-                <ComboBoxItem Content="Folders" />
-            </ComboBox>
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding FilterOptions}"
+                      SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay}"
+                      Width="160" />
         </Grid>
 
         <Grid Grid.Row="2" ColumnDefinitions="*,6,420" ColumnSpacing="0" Margin="16,12,16,0">
@@ -133,7 +137,17 @@
                           SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
                           SelectionChanged="OnEntriesSelectionChanged"
                           SelectionMode="Extended"
-                          RowBackground="#151413">
+                          RowBackground="#151413"
+                          DoubleTapped="OnEntriesDoubleTapped">
+                    <DataGrid.KeyBindings>
+                        <KeyBinding Gesture="Delete" Command="{Binding RemoveSelectedEntriesCommand}" />
+                    </DataGrid.KeyBindings>
+                    <DataGrid.RowTheme>
+                        <ControlTheme TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                            <Setter Property="Background" Value="{ReflectionBinding RowBackground}" />
+                            <Setter Property="Foreground" Value="{ReflectionBinding RowForeground}" />
+                        </ControlTheme>
+                    </DataGrid.RowTheme>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Type" Binding="{Binding ItemType}" Width="90" />
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
@@ -161,7 +175,7 @@
                     </Border>
 
                     <StackPanel Spacing="8">
-                        <TextBox Text="{Binding DetailNameEdit}" PlaceholderText="Name" IsEnabled="{Binding HasSelection}" />
+                        <TextBox x:Name="DetailNameBox" Text="{Binding DetailNameEdit}" PlaceholderText="Name" IsEnabled="{Binding HasSelection}" />
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                             <TextBox Text="{Binding DetailGenreEdit}" PlaceholderText="Genre" IsEnabled="{Binding HasSelection}" />
                             <TextBox Grid.Column="1" Text="{Binding DetailDeveloperEdit}" PlaceholderText="Developer" IsEnabled="{Binding HasSelection}" />
@@ -170,6 +184,7 @@
                         <StackPanel Orientation="Horizontal" Spacing="16">
                             <CheckBox Content="Favorite" IsChecked="{Binding DetailFavoriteEdit}" IsEnabled="{Binding HasSelection}" />
                             <CheckBox Content="Hidden" IsChecked="{Binding DetailHiddenEdit}" IsEnabled="{Binding HasSelection}" />
+                            <CheckBox Content="Kid Game" IsChecked="{Binding DetailKidgameEdit}" IsEnabled="{Binding HasSelection}" />
                         </StackPanel>
                     </StackPanel>
 
@@ -197,6 +212,66 @@
                             </Button>
                             <TextBlock Text="{Binding DetailRating}" Classes="muted" VerticalAlignment="Center" Margin="6,0,0,0" />
                         </StackPanel>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailImageEdit}" PlaceholderText="image" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="image" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for an image file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailVideoEdit}" PlaceholderText="video" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="video" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a video file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailMarqueeEdit}" PlaceholderText="marquee" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="marquee" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a marquee file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailWheelEdit}" PlaceholderText="wheel" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="wheel" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a wheel file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailFanartEdit}" PlaceholderText="fanart" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="fanart" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a fanart file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailThumbnailEdit}" PlaceholderText="thumbnail" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="thumbnail" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a thumbnail file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding DetailScreenshotEdit}" PlaceholderText="screenshot" IsEnabled="{Binding HasSelection}" />
+                            <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="screenshot" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for a screenshot file">
+                                <TextBlock Text="…" />
+                            </Button>
+                        </Grid>
+
+                        <Border Height="1" Background="{StaticResource WorkbenchBorder}" Margin="0,4" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <TextBlock Classes="section-title" Text="Orphan Media" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Classes="command-button" Command="{Binding FindOrphanMediaCommand}" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Find media files that exist on disk but are not linked to this entry">
+                                <TextBlock Text="Find Orphan Media" />
+                            </Button>
+                        </Grid>
+                        <TextBlock Classes="muted" Text="{Binding OrphanScanStatus}" TextWrapping="Wrap" />
+                        <ListBox ItemsSource="{Binding OrphanMediaItems}" MaxHeight="110" IsEnabled="{Binding HasSelection}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontFamily="Consolas, Courier New, monospace" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <Border Height="1" Background="{StaticResource WorkbenchBorder}" Margin="0,4" />
 

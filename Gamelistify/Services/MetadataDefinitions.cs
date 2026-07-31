@@ -60,4 +60,66 @@ public static class MetadataDefinitions
         "sg-1000", "snes", "vectrex", "virtualboy", "wii", "wonderswan",
         "wonderswancolor", "x68000", "zxspectrum",
     ];
+
+    private static readonly Dictionary<string, string> PlatformAliases = new(StringComparer.Ordinal)
+    {
+        ["gameboy"] = "gb",
+        ["gameboycolor"] = "gbc",
+        ["gameboyadvance"] = "gba",
+        ["playstation"] = "psx",
+        ["ps1"] = "psx",
+        ["psone"] = "psx",
+        ["megacd"] = "segacd",
+        ["mega-cd"] = "segacd",
+        ["mame"] = "mame-libretro",
+        ["neogeopocket"] = "ngp",
+        ["neogeopocketcolor"] = "ngpc",
+        ["neogeopocket-monochrome"] = "ngp",
+        ["turbografx16"] = "pcengine",
+        ["turbografx-16"] = "pcengine",
+        ["tg16"] = "pcengine",
+        ["commodore64"] = "c64",
+        ["a2600"] = "atari2600",
+        ["a5200"] = "atari5200",
+        ["a7800"] = "atari7800",
+        ["lynx"] = "atarilynx",
+        ["spectrum"] = "zxspectrum",
+        ["zx"] = "zxspectrum",
+        ["ds"] = "nds",
+        ["nintendods"] = "nds",
+        ["nintendowii"] = "wii",
+        ["supernintendo"] = "snes",
+        ["retropie"] = "arcade",
+    };
+
+    public static string? InferPlatform(string? directoryName)
+    {
+        if (string.IsNullOrWhiteSpace(directoryName))
+            return null;
+
+        var normalized = Normalize(directoryName);
+        if (normalized.Length == 0)
+            return null;
+
+        var match = Match(normalized);
+        if (match is not null)
+            return match;
+
+        var withoutExtension = Path.GetFileNameWithoutExtension(directoryName);
+        if (withoutExtension != directoryName && withoutExtension.Length > 0)
+            return Match(Normalize(withoutExtension));
+
+        return null;
+    }
+
+    private static string? Match(string normalized)
+    {
+        if (ScraperPlatforms.Any(p => Normalize(p) == normalized))
+            return ScraperPlatforms.First(p => Normalize(p) == normalized);
+
+        return PlatformAliases.TryGetValue(normalized, out var platform) ? platform : null;
+    }
+
+    private static string Normalize(string value) =>
+        new string(value.Trim().ToLowerInvariant().Where(c => char.IsLetterOrDigit(c) || c == '-').ToArray());
 }

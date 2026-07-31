@@ -20,6 +20,11 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+    public string[] FilterOptions { get; } = ["All Entries", "Games", "Folders"];
+
+    [ObservableProperty]
+    private int _selectedFilterIndex;
+
     [ObservableProperty]
     private string _statusText = "Ready. Open a gamelist.xml file to begin.";
 
@@ -81,6 +86,30 @@ public partial class MainViewModel : ViewModelBase
     private bool _detailHiddenEdit;
 
     [ObservableProperty]
+    private bool _detailKidgameEdit;
+
+    [ObservableProperty]
+    private string _detailImageEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailVideoEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailMarqueeEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailWheelEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailFanartEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailThumbnailEdit = string.Empty;
+
+    [ObservableProperty]
+    private string _detailScreenshotEdit = string.Empty;
+
+    [ObservableProperty]
     private string _detailPublisher = string.Empty;
 
     [ObservableProperty]
@@ -129,6 +158,11 @@ public partial class MainViewModel : ViewModelBase
 
     public ObservableCollection<GameRowViewModel> VisibleEntries { get; } = [];
 
+    public ObservableCollection<string> OrphanMediaItems { get; } = [];
+
+    [ObservableProperty]
+    private string _orphanScanStatus = "Run a scan to find unlinked media for the selected entry.";
+
     public ObservableCollection<string> RecentFiles { get; } = [];
 
     public Func<Task<string?>>? PickGamelistFileAsync { get; set; }
@@ -141,9 +175,11 @@ public partial class MainViewModel : ViewModelBase
 
     public Func<IReadOnlyList<ScannedRomItemViewModel>, string, Task<IReadOnlyList<ScannedRomItemViewModel>?>>? ReviewScannedRomsAsync { get; set; }
 
-    public Func<string, Task<(string Platform, string ExtraArguments)?>>? ChooseScrapeOptionsAsync { get; set; }
+    public Func<string, string?, Task<(string Platform, string ExtraArguments)?>>? ChooseScrapeOptionsAsync { get; set; }
 
     public Func<ScrapeProgressViewModel, Task>? ShowScrapeProgressAsync { get; set; }
+
+    public Func<string, string?, Task<string?>>? PickMediaFileAsync { get; set; }
 
     public Func<string, string, Task<bool>>? ConfirmAsync { get; set; }
 
@@ -199,6 +235,11 @@ public partial class MainViewModel : ViewModelBase
         ApplySearchFilter();
     }
 
+    partial void OnSelectedFilterIndexChanged(int value)
+    {
+        ApplySearchFilter();
+    }
+
     partial void OnSelectedEntryChanged(GameRowViewModel? value)
     {
         UpdateDetailPane(value);
@@ -221,6 +262,26 @@ public partial class MainViewModel : ViewModelBase
     partial void OnDetailFavoriteEditChanged(bool value) => ApplyEditorChanges();
 
     partial void OnDetailHiddenEditChanged(bool value) => ApplyEditorChanges();
+
+    partial void OnDetailKidgameEditChanged(bool value) => ApplyEditorChanges();
+
+    partial void OnDetailImageEditChanged(string value)
+    {
+        ApplyEditorChanges();
+        RefreshImagePreview();
+    }
+
+    partial void OnDetailVideoEditChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailMarqueeEditChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailWheelEditChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailFanartEditChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailThumbnailEditChanged(string value) => ApplyEditorChanges();
+
+    partial void OnDetailScreenshotEditChanged(string value) => ApplyEditorChanges();
 
     partial void OnDetailPublisherChanged(string value) => ApplyEditorChanges();
 
@@ -247,6 +308,73 @@ public partial class MainViewModel : ViewModelBase
     {
         if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var d))
             DetailRatingValue = double.Clamp(d, 0, 5);
+    }
+
+    [RelayCommand]
+    private async Task BrowseMediaAsync(string? fieldName)
+    {
+        if (string.IsNullOrWhiteSpace(fieldName) || PickMediaFileAsync is null || SelectedEntry is null)
+            return;
+
+        Logger.Debug("Browsing media file for field {Field}", fieldName);
+        var baseDirectory = _loadedDocument?.BaseDirectory ?? string.Empty;
+        var path = await PickMediaFileAsync(fieldName, baseDirectory);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            Logger.Debug("Media browse cancelled for {Field}", fieldName);
+            return;
+        }
+
+        Logger.Information("Setting media field {Field} to {Path}", fieldName, path);
+        SetMediaField(fieldName, path);
+    }
+
+    private void SetMediaField(string fieldName, string path)
+    {
+        switch (fieldName)
+        {
+            case "image":
+                DetailImageEdit = path;
+                break;
+            case "video":
+                DetailVideoEdit = path;
+                break;
+            case "marquee":
+                DetailMarqueeEdit = path;
+                break;
+            case "wheel":
+                DetailWheelEdit = path;
+                break;
+            case "fanart":
+                DetailFanartEdit = path;
+                break;
+            case "thumbnail":
+                DetailThumbnailEdit = path;
+                break;
+            case "screenshot":
+                DetailScreenshotEdit = path;
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private void FindOrphanMedia()
+    {
+        OrphanMediaItems.Clear();
+        if (SelectedEntry?.Entry is null || _loadedDocument is null)
+        {
+            OrphanScanStatus = "Select an entry to scan for orphan media.";
+            return;
+        }
+
+        Logger.Information("Scanning orphan media for {Entry}", SelectedEntry.Name);
+        var matches = MediaResolverService.FindOrphanImages(_loadedDocument.BaseDirectory, SelectedEntry.Entry);
+        foreach (var match in matches)
+            OrphanMediaItems.Add(match.MediaKey);
+
+        OrphanScanStatus = matches.Count == 0
+            ? "No orphan media found."
+            : $"Found {matches.Count} orphan media file{(matches.Count == 1 ? string.Empty : "s")}.";
     }
 
     partial void OnDetailVotesChanged(string value) => ApplyEditorChanges();
@@ -596,6 +724,11 @@ public partial class MainViewModel : ViewModelBase
         var search = SearchText.Trim();
         IEnumerable<GameRowViewModel> filtered = _allEntries;
 
+        if (SelectedFilterIndex == 1)
+            filtered = filtered.Where(static entry => entry.Entry.Kind == GamelistEntryKind.Game);
+        else if (SelectedFilterIndex == 2)
+            filtered = filtered.Where(static entry => entry.Entry.Kind == GamelistEntryKind.Folder);
+
         if (!string.IsNullOrWhiteSpace(search))
         {
             filtered = filtered.Where(entry =>
@@ -630,6 +763,14 @@ public partial class MainViewModel : ViewModelBase
             DetailDescriptionEdit = string.Empty;
             DetailFavoriteEdit = false;
             DetailHiddenEdit = false;
+            DetailKidgameEdit = false;
+            DetailImageEdit = string.Empty;
+            DetailVideoEdit = string.Empty;
+            DetailMarqueeEdit = string.Empty;
+            DetailWheelEdit = string.Empty;
+            DetailFanartEdit = string.Empty;
+            DetailThumbnailEdit = string.Empty;
+            DetailScreenshotEdit = string.Empty;
             DetailPublisher = string.Empty;
             DetailPlayers = string.Empty;
             DetailRating = string.Empty;
@@ -637,6 +778,8 @@ public partial class MainViewModel : ViewModelBase
             DetailReleaseDate = string.Empty;
             DetailLastPlayed = string.Empty;
             DetailPlayCount = string.Empty;
+            OrphanMediaItems.Clear();
+            OrphanScanStatus = "Run a scan to find unlinked media for the selected entry.";
             _suppressEditorApply = false;
             return;
         }
@@ -650,6 +793,14 @@ public partial class MainViewModel : ViewModelBase
         DetailDescriptionEdit = row.Description;
         DetailFavoriteEdit = row.Favorite;
         DetailHiddenEdit = row.Hidden;
+        DetailKidgameEdit = row.Entry.GetBooleanField("kidgame");
+        DetailImageEdit = row.Entry.GetField("image") ?? string.Empty;
+        DetailVideoEdit = row.Entry.GetField("video") ?? string.Empty;
+        DetailMarqueeEdit = row.Entry.GetField("marquee") ?? string.Empty;
+        DetailWheelEdit = row.Entry.GetField("wheel") ?? string.Empty;
+        DetailFanartEdit = row.Entry.GetField("fanart") ?? string.Empty;
+        DetailThumbnailEdit = row.Entry.GetField("thumbnail") ?? string.Empty;
+        DetailScreenshotEdit = row.Entry.GetField("screenshot") ?? string.Empty;
         DetailPublisher = row.Entry.GetField("publisher") ?? string.Empty;
         DetailPlayers = row.Entry.GetField("players") ?? string.Empty;
         DetailRating = row.Entry.GetField("rating") ?? string.Empty;
@@ -657,11 +808,27 @@ public partial class MainViewModel : ViewModelBase
         DetailReleaseDate = row.Entry.GetField("releasedate") ?? string.Empty;
         DetailLastPlayed = row.Entry.GetField("lastplayed") ?? string.Empty;
         DetailPlayCount = row.Entry.GetField("playcount") ?? string.Empty;
+        OrphanMediaItems.Clear();
+        OrphanScanStatus = "Run a scan to find unlinked media for the selected entry.";
         _suppressEditorApply = false;
 
         if (_loadedDocument is null)
             return;
 
+        LoadImagePreview();
+    }
+
+    private void LoadImagePreview()
+    {
+        if (SelectedEntry is null || _loadedDocument is null)
+        {
+            DetailImage?.Dispose();
+            DetailImage = null;
+            DetailImageStatus = "No image loaded.";
+            return;
+        }
+
+        var row = SelectedEntry;
         var resolvedImagePath = row.ImagePath is null
             ? null
             : MediaResolverService.ResolveMediaPath(_loadedDocument.BaseDirectory, row.ImagePath);
@@ -677,6 +844,16 @@ public partial class MainViewModel : ViewModelBase
         using var stream = File.OpenRead(resolvedImagePath);
         DetailImage = new Bitmap(stream);
         DetailImageStatus = $"Preview source: {Path.GetFileName(resolvedImagePath)}";
+    }
+
+    private void RefreshImagePreview()
+    {
+        if (_suppressEditorApply || SelectedEntry is null)
+            return;
+
+        DetailImage?.Dispose();
+        DetailImage = null;
+        LoadImagePreview();
     }
 
     private void ApplyEditorChanges()
@@ -700,8 +877,17 @@ public partial class MainViewModel : ViewModelBase
         SelectedEntry.Entry.SetField("releasedate", DetailReleaseDate.Trim());
         SelectedEntry.Entry.SetField("lastplayed", DetailLastPlayed.Trim());
         SelectedEntry.Entry.SetField("playcount", DetailPlayCount.Trim());
+        SelectedEntry.Entry.SetField("image", DetailImageEdit.Trim());
+        SelectedEntry.Entry.SetField("video", DetailVideoEdit.Trim());
+        SelectedEntry.Entry.SetField("marquee", DetailMarqueeEdit.Trim());
+        SelectedEntry.Entry.SetField("wheel", DetailWheelEdit.Trim());
+        SelectedEntry.Entry.SetField("fanart", DetailFanartEdit.Trim());
+        SelectedEntry.Entry.SetField("thumbnail", DetailThumbnailEdit.Trim());
+        SelectedEntry.Entry.SetField("screenshot", DetailScreenshotEdit.Trim());
         SelectedEntry.Entry.SetBooleanField("favorite", DetailFavoriteEdit);
         SelectedEntry.Entry.SetBooleanField("hidden", DetailHiddenEdit);
+        SelectedEntry.Entry.SetBooleanField("kidgame", DetailKidgameEdit);
+        SelectedEntry.Refresh();
 
         IsDirty = true;
         UpdateWindowTitle();
@@ -764,6 +950,7 @@ public partial class MainViewModel : ViewModelBase
         _settings.LastGamelistDirectory = Path.GetDirectoryName(filePath) ?? string.Empty;
         RegisterRecentFile(filePath);
         await SettingsService.SaveAsync(AppPaths.SettingsPath, _settings);
+        SelectedFilterIndex = 0;
         ApplySearchFilter();
         SelectedEntry = VisibleEntries.FirstOrDefault();
         EntryCountText = $"{_allEntries.Count} entries";
@@ -827,7 +1014,12 @@ public partial class MainViewModel : ViewModelBase
             return null;
         }
 
-        return await ChooseScrapeOptionsAsync(title);
+        var suggestedPlatform = MetadataDefinitions.InferPlatform(
+            _loadedDocument is not null ? Path.GetFileName(Path.TrimEndingDirectorySeparator(_loadedDocument.BaseDirectory)) : null);
+        if (suggestedPlatform is not null)
+            Logger.Debug("Inferred platform {Platform} from base directory", suggestedPlatform);
+
+        return await ChooseScrapeOptionsAsync(title, suggestedPlatform);
     }
 
     private async Task<SkyscraperService.RunResult?> RunScrapeAsync(string title, ScrapeRequest request)
@@ -892,7 +1084,10 @@ public partial class MainViewModel : ViewModelBase
 
         Logger.Information("Bulk action: {Field}={Value} on {Count} entries", fieldName, value, _selectedEntries.Count);
         foreach (var row in _selectedEntries)
+        {
             row.Entry.SetBooleanField(fieldName, value);
+            row.Refresh();
+        }
 
         IsDirty = true;
         UpdateWindowTitle();

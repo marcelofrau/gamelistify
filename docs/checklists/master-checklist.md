@@ -70,3 +70,15 @@ title: Master Checklist
 - [ ] Add screenshots
 - [x] Expand docs for website publishing
 - [x] Add contribution templates
+
+## Phase 6 - Feature Parity Gaps
+
+- [x] Add kind filter combo (All Entries / Games / Folders)
+- [x] Add per-row tint for favorite / hidden entries
+- [x] Add keyboard shortcuts (Ctrl+O, Ctrl+S, Ctrl+F, Delete, double-click edit)
+- [x] Add kid game boolean editing
+- [x] Add media path editor (image/video/marquee/wheel/fanart/thumbnail/screenshot) with browse buttons
+- [x] Add orphan media scan from detail pane
+- [x] Add progress parsing (percent / ratio / current game) with progress bar
+- [x] Add platform auto-detection from base directory
+- [ ] Add screenshots (deferred)

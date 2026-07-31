@@ -81,6 +81,54 @@ public partial class App : Application
                 return path;
             };
 
+            mainViewModel.PickMediaFileAsync = async (fieldName, baseDirectory) =>
+            {
+                Logger.Debug("Media file picker requested for {Field}", fieldName);
+
+                IStorageFolder? suggestedStartLocation = null;
+                if (!string.IsNullOrWhiteSpace(baseDirectory))
+                    suggestedStartLocation = await mainWindow.StorageProvider.TryGetFolderFromPathAsync(baseDirectory);
+
+                var files = await mainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = $"Select {fieldName}",
+                    AllowMultiple = false,
+                    SuggestedStartLocation = suggestedStartLocation,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("Media files")
+                        {
+                            Patterns = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.bmp", "*.mp4", "*.avi"],
+                        },
+                    ],
+                });
+
+                var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    Logger.Debug("Media file picker cancelled for {Field}", fieldName);
+                    return null;
+                }
+
+                var storedPath = path;
+                if (!string.IsNullOrWhiteSpace(baseDirectory))
+                {
+                    try
+                    {
+                        var relative = Path.GetRelativePath(baseDirectory, path).Replace('\\', '/');
+                        if (!relative.StartsWith("..", StringComparison.Ordinal))
+                            storedPath = $"./{relative}";
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Failed to compute relative media path; storing absolute path");
+                    }
+                }
+
+                Logger.Debug("Media file selected for {Field}: {Path}", fieldName, storedPath);
+                return storedPath;
+            };
+
             mainViewModel.ShowAboutAsync = async () =>
             {
                 Logger.Information("Showing About window");
@@ -160,10 +208,10 @@ public partial class App : Application
                 return scanViewModel.SelectedItems;
             };
 
-            mainViewModel.ChooseScrapeOptionsAsync = async title =>
+            mainViewModel.ChooseScrapeOptionsAsync = async (title, suggestedPlatform) =>
             {
                 Logger.Information("Showing scrape options window: {Title}", title);
-                var optionsViewModel = new ScrapeOptionsViewModel(title);
+                var optionsViewModel = new ScrapeOptionsViewModel(title, suggestedPlatform);
                 var optionsWindow = new ScrapeOptionsWindow
                 {
                     DataContext = optionsViewModel,

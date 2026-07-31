@@ -7,13 +7,15 @@ namespace Gamelistify.ViewModels;
 
 public partial class ScrapeOptionsViewModel : ViewModelBase
 {
-    public ScrapeOptionsViewModel(string title)
+    public ScrapeOptionsViewModel(string title, string? suggestedPlatform = null)
     {
         Title = title;
         foreach (var platform in MetadataDefinitions.ScraperPlatforms)
             Platforms.Add(platform);
 
-        SelectedPlatform = Platforms.FirstOrDefault() ?? string.Empty;
+        SelectedPlatform = Platforms.Contains(suggestedPlatform ?? string.Empty)
+            ? suggestedPlatform!
+            : Platforms.FirstOrDefault() ?? string.Empty;
     }
 
     public string Title { get; }

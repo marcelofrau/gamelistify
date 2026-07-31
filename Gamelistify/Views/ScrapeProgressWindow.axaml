@@ -9,17 +9,21 @@
         WindowStartupLocation="CenterOwner"
         CanResize="True">
   <Border Margin="16" Classes="panel" Padding="16">
-    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
       <TextBlock Grid.Row="0" Classes="section-title" Text="{Binding Title}" />
-      <TextBlock Grid.Row="1" Text="{Binding Status}" Classes="muted" TextWrapping="Wrap" />
-      <ListBox Grid.Row="2" ItemsSource="{Binding LogLines}">
+      <StackPanel Grid.Row="1" Spacing="4">
+        <TextBlock Text="{Binding Status}" Classes="muted" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding CurrentGame}" Classes="muted" TextWrapping="Wrap" FontWeight="SemiBold" />
+      </StackPanel>
+      <ProgressBar Grid.Row="2" Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="8" />
+      <ListBox Grid.Row="3" ItemsSource="{Binding LogLines}">
         <ListBox.ItemTemplate>
           <DataTemplate>
             <TextBlock Text="{Binding}" FontFamily="Consolas, Courier New, monospace" TextWrapping="Wrap" />
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-      <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
         <Button Classes="command-button" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" ToolTip.Tip="Cancel the current scrape operation">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Path Classes="dialog-icon" Data="{StaticResource IconX}" />

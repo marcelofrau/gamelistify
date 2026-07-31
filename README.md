@@ -13,8 +13,13 @@ Current state:
 - core XML domain services in place (load, save, backup)
 - desktop shell with searchable grid, resizable detail pane
 - full editing workflow (single-entry, bulk actions, dirty-state, recent files)
+- kind filter (All Entries / Games / Folders) with favorite/hidden row tinting
+- keyboard shortcuts (Ctrl+O, Ctrl+S, Ctrl+F, Delete, double-click edit)
+- kid game flag and media path editor (image, video, marquee, wheel, fanart, thumbnail, screenshot)
+- orphan media scan from the detail pane
 - ROM scan workflow (detect missing entries, review, adopt)
-- scrape workflow with progress, cancel, and live output
+- scrape workflow with progress, cancel, live output, and progress parsing
+- platform auto-detection from the base directory
 - star rating control with clickable 5-star UI
 - confirmation dialogs for destructive actions
 - settings window with runtime log level switching
