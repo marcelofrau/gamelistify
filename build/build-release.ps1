@@ -3,7 +3,7 @@ param(
     [string]$Version,
     [string]$Rid = "win-x64",
     [string]$Project = "Gamelistify/Gamelistify.csproj",
-    [string]$OutputDir = "dist"
+    [string]$OutputDir = "build/dist"
 )
 
 $Version = $Version -replace '^v', ''
