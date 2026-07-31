@@ -3,13 +3,13 @@
         xmlns:vm="using:Gamelistify.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="935"
         x:Class="Gamelistify.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/gamelistify.ico"
         Title="{Binding WindowTitle}"
         Width="1440"
-        Height="900"
+        Height="935"
         MinWidth="1100"
         MinHeight="720">
 
@@ -26,78 +26,147 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="0">
         <Border Grid.Row="0" Classes="toolbar-shell" Padding="8,6" Margin="0">
-            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="0">
-                <Button Grid.Column="0" Classes="command-button toolbar-button" Command="{Binding OpenCommand}" ToolTip.Tip="Open a gamelist.xml file">
-                    <StackPanel Spacing="4">
-                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
-                        <TextBlock Classes="toolbar-label" Text="Open" />
-                    </StackPanel>
-                </Button>
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="0">
+                <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="0">
+                    <Button Classes="command-button toolbar-button" Command="{Binding OpenCommand}" ToolTip.Tip="Open a gamelist.xml file">
+                        <StackPanel Spacing="4">
+                            <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
+                            <TextBlock Classes="toolbar-label" Text="Open" />
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="1" Classes="command-button toolbar-button chevron-button" ToolTip.Tip="Open recent files">
+                        <Button.Flyout>
+                            <MenuFlyout ItemsSource="{Binding OpenFlyoutItems}">
+                                <MenuFlyout.ItemContainerTheme>
+                                    <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="vm:OpenFlyoutItem">
+                                        <Setter Property="Header" Value="{Binding Header}" />
+                                        <Setter Property="Command" Value="{Binding Command}" />
+                                        <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+                                        <Setter Property="ToolTip.Tip" Value="{Binding ToolTip}" />
+                                    </ControlTheme>
+                                </MenuFlyout.ItemContainerTheme>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                        <Path Data="{StaticResource IconChevronDown}" Width="12" Height="12" Fill="#22160E" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Button>
+                </Grid>
                 <Button Grid.Column="1" Classes="command-button toolbar-button" Command="{Binding SaveCommand}" ToolTip.Tip="Save current gamelist and create a backup">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Save" />
                     </StackPanel>
                 </Button>
-                <Border Grid.Column="2" Classes="toolbar-group-separator" />
-                <Button Grid.Column="3" Classes="command-button toolbar-button" Command="{Binding ScanRomsCommand}" ToolTip.Tip="Scan a ROM directory and add missing entries">
+                <Button Grid.Column="2" Classes="command-button toolbar-button" ToolTip.Tip="Add a game or folder entry to the gamelist">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Add Game" Command="{Binding AddGameCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-add-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Add Folder" Command="{Binding AddFolderCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-folder-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-add-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Add" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="3" Classes="command-button toolbar-button" Command="{Binding ReloadCommand}" ToolTip.Tip="Discard unsaved changes and reload the gamelist from disk">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-revert-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Revert" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" Classes="command-button toolbar-button" Command="{Binding RestoreBackupCommand}" ToolTip.Tip="Restore the gamelist from a backup">
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-restore-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Restore" />
+                    </StackPanel>
+                </Button>
+                <Border Grid.Column="5" Classes="toolbar-group-separator" />
+                <Button Grid.Column="6" Classes="command-button toolbar-button" Command="{Binding ScanRomsCommand}" ToolTip.Tip="Scan a ROM directory and add missing entries">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scan-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Scan" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="4" Classes="command-button toolbar-button" Command="{Binding ScrapeSelectedCommand}" ToolTip.Tip="Run Skyscraper for selected entries">
+                <Button Grid.Column="7" Classes="command-button toolbar-button" Command="{Binding ScrapeSelectedCommand}" ToolTip.Tip="Run Skyscraper for selected entries">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scrapesel-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Scrape Sel" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="5" Classes="command-button toolbar-button" Command="{Binding ScrapeAllCommand}" ToolTip.Tip="Run Skyscraper for the whole loaded library">
+                <Button Grid.Column="8" Classes="command-button toolbar-button" Command="{Binding ScrapeAllCommand}" ToolTip.Tip="Run Skyscraper for the whole loaded library">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-scrapeall-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Scrape All" />
                     </StackPanel>
                 </Button>
-                <Border Grid.Column="6" Classes="toolbar-group-separator" />
-                <Button Grid.Column="7" Classes="command-button toolbar-button" Command="{Binding HideSelectedCommand}" ToolTip.Tip="Hide all selected entries">
+                <Border Grid.Column="9" Classes="toolbar-group-separator" />
+                <Button Grid.Column="10" Classes="command-button toolbar-button" Command="{Binding HideSelectedCommand}" ToolTip.Tip="Hide all selected entries">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-hide-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Hide" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="8" Classes="command-button toolbar-button" Command="{Binding UnhideSelectedCommand}" ToolTip.Tip="Unhide all selected entries">
+                <Button Grid.Column="11" Classes="command-button toolbar-button" Command="{Binding UnhideSelectedCommand}" ToolTip.Tip="Unhide all selected entries">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-unhide-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Unhide" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="9" Classes="command-button toolbar-button" Command="{Binding FavoriteSelectedCommand}" ToolTip.Tip="Mark selected entries as favorites">
+                <Button Grid.Column="12" Classes="command-button toolbar-button" Command="{Binding FavoriteSelectedCommand}" ToolTip.Tip="Mark selected entries as favorites">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-favorite-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Fav" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="10" Classes="command-button toolbar-button" Command="{Binding UnfavoriteSelectedCommand}" ToolTip.Tip="Remove favorite flag from selected entries">
+                <Button Grid.Column="13" Classes="command-button toolbar-button" Command="{Binding UnfavoriteSelectedCommand}" ToolTip.Tip="Remove favorite flag from selected entries">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-unfavorite-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Unfav" />
                     </StackPanel>
                 </Button>
-                <Border Grid.Column="11" Classes="toolbar-group-separator" />
-                <Button Grid.Column="12" Classes="command-button toolbar-button" Command="{Binding RemoveSelectedEntriesCommand}" ToolTip.Tip="Remove selected entries from the gamelist">
+                <Border Grid.Column="14" Classes="toolbar-group-separator" />
+                <Button Grid.Column="15" Classes="command-button toolbar-button" Command="{Binding RemoveSelectedEntriesCommand}" ToolTip.Tip="Remove selected entries from the gamelist">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-remove-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Remove" />
                     </StackPanel>
                 </Button>
-                <Border Grid.Column="13" Classes="toolbar-group-separator" />
-                <Button Grid.Column="15" Classes="command-button toolbar-button" Command="{Binding OpenSettingsCommand}" HorizontalAlignment="Right" ToolTip.Tip="Open application settings">
+                <Border Grid.Column="16" Classes="toolbar-group-separator" />
+                <Button Grid.Column="17" Classes="command-button toolbar-button" ToolTip.Tip="Optimize the gamelist XML or remove invalid entries">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Optimize" Command="{Binding OptimizeCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-optimize-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Cleanup" Command="{Binding CleanupCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-remove-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-optimize-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Optimize" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="19" Classes="command-button toolbar-button" Command="{Binding OpenSettingsCommand}" HorizontalAlignment="Right" ToolTip.Tip="Open application settings">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-settings-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Settings" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="16" Classes="command-button toolbar-button" Command="{Binding OpenAboutCommand}" HorizontalAlignment="Right" ToolTip.Tip="Show version, license, and project links">
+                <Button Grid.Column="20" Classes="command-button toolbar-button" Command="{Binding OpenAboutCommand}" HorizontalAlignment="Right" ToolTip.Tip="Show version, license, and project links">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-about-32.png" />
                         <TextBlock Classes="toolbar-label" Text="About" />
@@ -149,13 +218,25 @@
                         </ControlTheme>
                     </DataGrid.RowTheme>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Type" Binding="{Binding ItemType}" Width="90" />
+                        <DataGridTemplateColumn Header="Type" Width="44" CanUserSort="True" SortMemberPath="ItemType">
+                            <DataTemplate>
+                                <Path Data="{Binding TypeIcon}" Classes="grid-icon" Fill="Transparent" Stroke="{Binding RowForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
-                        <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="3*" />
-                        <DataGridCheckBoxColumn Header="Hidden" Binding="{Binding Hidden}" Width="90" />
-                        <DataGridCheckBoxColumn Header="Favorite" Binding="{Binding Favorite}" Width="90" />
+                        <DataGridTemplateColumn Header="Hidden" Width="44">
+                            <DataTemplate>
+                                <Path Data="{Binding HiddenIcon}" Classes="grid-icon" Fill="Transparent" Stroke="{Binding RowForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Favorite" Width="56">
+                            <DataTemplate>
+                                <Path Data="{StaticResource IconStar}" Classes="grid-icon" Fill="{Binding FavoriteIconFill}" Stroke="{Binding RowForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="140" />
                         <DataGridTextColumn Header="Developer" Binding="{Binding Developer}" Width="180" />
+                        <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="3*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
@@ -163,9 +244,8 @@
             <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" Width="5" />
 
             <Border Grid.Column="2" Classes="panel" Padding="10" Margin="6,0,0,0">
-                <ScrollViewer>
-                <StackPanel Spacing="10">
-                    <Border MinHeight="160" Background="{StaticResource WorkbenchSurfaceAlt}" BorderBrush="{StaticResource WorkbenchAccent}" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+                    <Border Grid.Row="0" MinHeight="160" Background="{StaticResource WorkbenchSurfaceAlt}" BorderBrush="{StaticResource WorkbenchAccent}" BorderThickness="1" CornerRadius="8" Padding="12">
                         <Border Background="#101012" CornerRadius="6">
                             <Grid>
                                 <Image Classes="preview-image" Source="{Binding DetailImage}" IsVisible="{Binding HasDetailImage}" />
@@ -174,8 +254,13 @@
                         </Border>
                     </Border>
 
+                    <TextBox Grid.Row="1" x:Name="DetailNameBox" Text="{Binding DetailNameEdit}" PlaceholderText="Name" IsEnabled="{Binding HasSelection}" />
+
+                    <TabControl Grid.Row="2">
+                    <TabItem Header="Info">
+                    <ScrollViewer>
+                    <StackPanel Spacing="10">
                     <StackPanel Spacing="8">
-                        <TextBox x:Name="DetailNameBox" Text="{Binding DetailNameEdit}" PlaceholderText="Name" IsEnabled="{Binding HasSelection}" />
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                             <TextBox Text="{Binding DetailGenreEdit}" PlaceholderText="Genre" IsEnabled="{Binding HasSelection}" />
                             <TextBox Grid.Column="1" Text="{Binding DetailDeveloperEdit}" PlaceholderText="Developer" IsEnabled="{Binding HasSelection}" />
@@ -195,24 +280,31 @@
                         <TextBox Text="{Binding DetailReleaseDate}" PlaceholderText="Release Date" IsEnabled="{Binding HasSelection}" />
                         <TextBox Text="{Binding DetailLastPlayed}" PlaceholderText="Last Played" IsEnabled="{Binding HasSelection}" />
                         <StackPanel Orientation="Horizontal" Spacing="1">
-                            <Button Width="26" Height="26" Padding="2" Background="Transparent" BorderThickness="0" Command="{Binding SetRatingCommand}" CommandParameter="1" IsEnabled="{Binding HasSelection}">
+                            <Button Classes="star-button" Command="{Binding SetRatingCommand}" CommandParameter="1" IsEnabled="{Binding HasSelection}">
                                 <Path Data="{StaticResource IconStar}" Fill="{Binding Star1Filled, Converter={StaticResource BoolToStarBrush}}" Stretch="Uniform" />
                             </Button>
-                            <Button Width="26" Height="26" Padding="2" Background="Transparent" BorderThickness="0" Command="{Binding SetRatingCommand}" CommandParameter="2" IsEnabled="{Binding HasSelection}">
+                            <Button Classes="star-button" Command="{Binding SetRatingCommand}" CommandParameter="2" IsEnabled="{Binding HasSelection}">
                                 <Path Data="{StaticResource IconStar}" Fill="{Binding Star2Filled, Converter={StaticResource BoolToStarBrush}}" Stretch="Uniform" />
                             </Button>
-                            <Button Width="26" Height="26" Padding="2" Background="Transparent" BorderThickness="0" Command="{Binding SetRatingCommand}" CommandParameter="3" IsEnabled="{Binding HasSelection}">
+                            <Button Classes="star-button" Command="{Binding SetRatingCommand}" CommandParameter="3" IsEnabled="{Binding HasSelection}">
                                 <Path Data="{StaticResource IconStar}" Fill="{Binding Star3Filled, Converter={StaticResource BoolToStarBrush}}" Stretch="Uniform" />
                             </Button>
-                            <Button Width="26" Height="26" Padding="2" Background="Transparent" BorderThickness="0" Command="{Binding SetRatingCommand}" CommandParameter="4" IsEnabled="{Binding HasSelection}">
+                            <Button Classes="star-button" Command="{Binding SetRatingCommand}" CommandParameter="4" IsEnabled="{Binding HasSelection}">
                                 <Path Data="{StaticResource IconStar}" Fill="{Binding Star4Filled, Converter={StaticResource BoolToStarBrush}}" Stretch="Uniform" />
                             </Button>
-                            <Button Width="26" Height="26" Padding="2" Background="Transparent" BorderThickness="0" Command="{Binding SetRatingCommand}" CommandParameter="5" IsEnabled="{Binding HasSelection}">
+                            <Button Classes="star-button" Command="{Binding SetRatingCommand}" CommandParameter="5" IsEnabled="{Binding HasSelection}">
                                 <Path Data="{StaticResource IconStar}" Fill="{Binding Star5Filled, Converter={StaticResource BoolToStarBrush}}" Stretch="Uniform" />
                             </Button>
                             <TextBlock Text="{Binding DetailRating}" Classes="muted" VerticalAlignment="Center" Margin="6,0,0,0" />
                         </StackPanel>
+                    </StackPanel>
+                    </StackPanel>
+                    </ScrollViewer>
+                    </TabItem>
 
+                    <TabItem Header="Media">
+                    <ScrollViewer>
+                    <StackPanel Spacing="10">
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
                             <TextBox Text="{Binding DetailImageEdit}" PlaceholderText="image" IsEnabled="{Binding HasSelection}" />
                             <Button Grid.Column="1" Width="34" Padding="0" Classes="command-button" Command="{Binding BrowseMediaCommand}" CommandParameter="image" IsEnabled="{Binding HasSelection}" ToolTip.Tip="Browse for an image file">
@@ -275,36 +367,45 @@
 
                         <Border Height="1" Background="{StaticResource WorkbenchBorder}" Margin="0,4" />
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                            <Button Classes="command-button primary" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedDocument}">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
-                                    <TextBlock Text="Save" />
-                                </StackPanel>
-                            </Button>
-                            <Button Classes="command-button" Command="{Binding RemoveEntryCommand}" IsEnabled="{Binding HasSelection}">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-remove-32.png" />
-                                    <TextBlock Text="Remove" />
-                                </StackPanel>
-                            </Button>
-                            <Button Classes="command-button" Command="{Binding ReloadCommand}" IsEnabled="{Binding HasLoadedDocument}">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
-                                    <TextBlock Text="Discard" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-                </ScrollViewer>
+                    </ScrollViewer>
+                    </TabItem>
+                    </TabControl>
+
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Classes="command-button primary" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedDocument}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
+                                <TextBlock Text="Save" />
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="command-button" Command="{Binding RemoveEntryCommand}" IsEnabled="{Binding HasSelection}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-remove-32.png" />
+                                <TextBlock Text="Remove" />
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="command-button" Command="{Binding ReloadCommand}" IsEnabled="{Binding IsDirty}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
+                                <TextBlock Text="Discard" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 
         <Border Grid.Row="3" Margin="16,12,16,16" Padding="12,8" Background="{StaticResource WorkbenchSurface}">
-            <Grid ColumnDefinitions="*,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                 <TextBlock Classes="muted" Text="{Binding StatusText}" VerticalAlignment="Center" />
-                <Button Grid.Column="1" Classes="link-button" Content="Quick Tips" Padding="0" Background="Transparent" BorderThickness="0">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center" IsVisible="{Binding IsDirty}">
+                    <Grid Width="16" Height="16">
+                        <Path Data="{StaticResource IconWarningMark}" Stretch="Uniform" Fill="{StaticResource WorkbenchWarning}" />
+                    </Grid>
+                    <TextBlock Text="Unsaved changes" Foreground="{StaticResource WorkbenchWarning}" VerticalAlignment="Center" FontSize="12" />
+                </StackPanel>
+                <Button Grid.Column="2" Classes="link-button" Content="Quick Tips" Padding="0" Background="Transparent" BorderThickness="0">
                     <Button.Flyout>
                         <Flyout Placement="Top">
                             <Border Background="{StaticResource WorkbenchSuccess}" BorderBrush="#1E3323" BorderThickness="1" CornerRadius="6" Padding="14,10" MinWidth="260" MaxWidth="340">

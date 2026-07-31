@@ -13,4 +13,34 @@ public sealed class GamelistPathHelperTests
     {
         Assert.Equal(expected, GamelistPathHelper.NormalizeStoredPath(input));
     }
+
+    [Theory]
+    [InlineData("./roms/game.zip", @"C:\base\roms\game.zip")]
+    [InlineData("roms/game.zip", @"C:\base\roms\game.zip")]
+    [InlineData("game.zip", @"C:\base\game.zip")]
+    [InlineData("sub\\nested.zip", @"C:\base\sub\nested.zip")]
+    public void ResolveToAbsolutePath_resolves_relative_to_base(string input, string expected)
+    {
+        const string baseDirectory = @"C:\base";
+
+        var result = GamelistPathHelper.ResolveToAbsolutePath(input, baseDirectory);
+
+        Assert.Equal(Path.GetFullPath(expected), result);
+    }
+
+    [Fact]
+    public void ResolveToAbsolutePath_expands_tilde_to_user_profile()
+    {
+        var result = GamelistPathHelper.ResolveToAbsolutePath("~/roms/game.zip", @"C:\base");
+
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        Assert.Equal(Path.GetFullPath(Path.Combine(userProfile, "roms/game.zip")), result);
+    }
+
+    [Fact]
+    public void ResolveToAbsolutePath_returns_null_for_blank_path()
+    {
+        Assert.Null(GamelistPathHelper.ResolveToAbsolutePath(string.Empty, @"C:\base"));
+        Assert.Null(GamelistPathHelper.ResolveToAbsolutePath("   ", @"C:\base"));
+    }
 }

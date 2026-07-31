@@ -31,12 +31,84 @@ public sealed class GamelistServiceTests
             var document = await GamelistService.LoadAsync(sourcePath);
             document.Entries[0].SetField("name", "Alien Soldier (USA)");
 
-            await GamelistService.SaveAsync(document);
+            var backupPath = await GamelistService.SaveAsync(document);
 
             var savedXml = await File.ReadAllTextAsync(sourcePath);
             Assert.Contains("Alien Soldier (USA)", savedXml, StringComparison.Ordinal);
             Assert.Contains("<customTag>keep me</customTag>", savedXml, StringComparison.Ordinal);
-            Assert.Single(Directory.GetFiles(tempDirectory, "*.bak"));
+            Assert.NotNull(backupPath);
+            Assert.True(File.Exists(backupPath));
+            var backupDirectory = Path.Combine(tempDirectory, "gamelists_backup");
+            Assert.Single(Directory.GetFiles(backupDirectory, "*.bak"));
+            Assert.Equal(Path.GetFileName(backupPath), Path.GetFileName(Directory.GetFiles(backupDirectory, "*.bak").Single()));
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task SaveAsync_compact_writes_minified_single_line_xml()
+    {
+        var tempDirectory = CreateTempDirectory();
+        try
+        {
+            var sourcePath = Path.Combine(tempDirectory, "gamelist.xml");
+            File.Copy(GetFixturePath("sample-gamelist.xml"), sourcePath);
+
+            var document = await GamelistService.LoadAsync(sourcePath);
+
+            await GamelistService.SaveAsync(document, compact: true);
+
+            var savedXml = await File.ReadAllTextAsync(sourcePath);
+            Assert.DoesNotContain(Environment.NewLine, savedXml);
+            Assert.Contains("<game>", savedXml, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task GetInvalidEntries_detects_missing_files_and_skips_folders()
+    {
+        var tempDirectory = CreateTempDirectory();
+        try
+        {
+            var sourcePath = Path.Combine(tempDirectory, "gamelist.xml");
+            await File.WriteAllTextAsync(sourcePath, """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <gameList>
+                  <game>
+                    <path>./missing.zip</path>
+                    <name>Missing</name>
+                  </game>
+                  <game>
+                    <path>./existing.zip</path>
+                    <name>Existing</name>
+                  </game>
+                  <game>
+                    <name>No Path</name>
+                  </game>
+                  <folder>
+                    <path>./Shmups</path>
+                    <name>Shmups</name>
+                  </folder>
+                </gameList>
+                """);
+
+            File.WriteAllBytes(Path.Combine(tempDirectory, "existing.zip"), [1, 2, 3]);
+            var document = await GamelistService.LoadAsync(sourcePath);
+
+            var invalid = GamelistService.GetInvalidEntries(document);
+
+            Assert.Equal(2, invalid.Count);
+            Assert.Contains(document.Entries[0], invalid);
+            Assert.DoesNotContain(document.Entries[1], invalid);
+            Assert.Contains(document.Entries[2], invalid);
+            Assert.DoesNotContain(document.Entries[3], invalid);
         }
         finally
         {

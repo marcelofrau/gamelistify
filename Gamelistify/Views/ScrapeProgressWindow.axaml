@@ -26,13 +26,13 @@
       <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
         <Button Classes="command-button" Command="{Binding CancelCommand}" IsEnabled="{Binding CanCancel}" ToolTip.Tip="Cancel the current scrape operation">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
             <TextBlock Text="Cancel" />
           </StackPanel>
         </Button>
         <Button Classes="command-button primary" IsEnabled="{Binding CanClose}" Click="OnCloseClick" ToolTip.Tip="Close progress view and refresh list">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
             <TextBlock Text="Close" />
           </StackPanel>
         </Button>

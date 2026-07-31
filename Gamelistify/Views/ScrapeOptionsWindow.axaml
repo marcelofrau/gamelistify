@@ -23,13 +23,13 @@
       <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
         <Button Classes="command-button primary" Command="{Binding AcceptCommand}" Click="OnStartClick" ToolTip.Tip="Begin scraping with these options">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconPlay}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-play-32.png" />
             <TextBlock Text="Start" />
           </StackPanel>
         </Button>
         <Button Classes="command-button" Click="OnCancelClick" ToolTip.Tip="Cancel and go back">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
             <TextBlock Text="Cancel" />
           </StackPanel>
         </Button>

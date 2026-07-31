@@ -10,7 +10,7 @@ public static class Logger
     private static bool _initialized;
     private static LoggingLevelSwitch? _levelSwitch;
 
-    public static void Init(LogEventLevel minimumLevel = LogEventLevel.Verbose)
+    public static void Init(LogEventLevel minimumLevel = LogEventLevel.Verbose, bool consoleEnabled = false)
     {
         if (_initialized)
             return;
@@ -24,20 +24,29 @@ public static class Logger
 
         Directory.CreateDirectory(logDirectory);
 
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.ControlledBy(_levelSwitch)
-            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+        var configuration = new LoggerConfiguration()
+            .MinimumLevel.ControlledBy(_levelSwitch);
+
+        if (consoleEnabled)
+        {
+            configuration = configuration.WriteTo.Console(
+                formatProvider: CultureInfo.InvariantCulture,
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
+        }
+
+        Log.Logger = configuration
             .WriteTo.File(
                 Path.Combine(logDirectory, "gamelistify-.log"),
                 formatProvider: CultureInfo.InvariantCulture,
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 10,
+                retainedFileTimeLimit: TimeSpan.FromDays(5),
                 shared: true,
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
         _initialized = true;
-        Log.Verbose("Logger initialized. Directory: {Directory}", logDirectory);
+        Log.Verbose("Logger initialized. Directory: {Directory}. Rolling: daily, retained 5 days (count cap 10).", logDirectory);
     }
 
     public static void SetMinimumLevel(LogEventLevel level)

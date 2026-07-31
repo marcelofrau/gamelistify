@@ -14,7 +14,7 @@ public sealed class AppSettings
 
     public int ImagePreviewSize { get; set; } = 220;
 
-    public bool DebugLogging { get; set; }
+    public string LogLevel { get; set; } = "Verbose";
 
     public List<string> RecentFiles { get; set; } = [];
 

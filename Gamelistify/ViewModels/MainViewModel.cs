@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Gamelistify.Helpers;
 using Gamelistify.Models;
 using Gamelistify.Services;
+using Serilog.Events;
 
 namespace Gamelistify.ViewModels;
 
@@ -48,9 +49,6 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _entryCountText = "0 entries";
-
-    [ObservableProperty]
-    private string? _selectedRecentFile;
 
     [ObservableProperty]
     private string _detailNameEdit = string.Empty;
@@ -126,11 +124,11 @@ public partial class MainViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(Star5Filled))]
     private double _detailRatingValue;
 
-    public bool Star1Filled => DetailRatingValue >= 1.0;
-    public bool Star2Filled => DetailRatingValue >= 2.0;
-    public bool Star3Filled => DetailRatingValue >= 3.0;
-    public bool Star4Filled => DetailRatingValue >= 4.0;
-    public bool Star5Filled => DetailRatingValue >= 5.0;
+    public bool Star1Filled => Math.Round(DetailRatingValue * 5, MidpointRounding.AwayFromZero) >= 1;
+    public bool Star2Filled => Math.Round(DetailRatingValue * 5, MidpointRounding.AwayFromZero) >= 2;
+    public bool Star3Filled => Math.Round(DetailRatingValue * 5, MidpointRounding.AwayFromZero) >= 3;
+    public bool Star4Filled => Math.Round(DetailRatingValue * 5, MidpointRounding.AwayFromZero) >= 4;
+    public bool Star5Filled => Math.Round(DetailRatingValue * 5, MidpointRounding.AwayFromZero) >= 5;
 
     [ObservableProperty]
     private string _detailVotes = string.Empty;
@@ -146,6 +144,11 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isDirty;
+
+    partial void OnIsDirtyChanged(bool value)
+    {
+        ReloadCommand.NotifyCanExecuteChanged();
+    }
 
     [ObservableProperty]
     private Bitmap? _detailImage;
@@ -163,9 +166,13 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _orphanScanStatus = "Run a scan to find unlinked media for the selected entry.";
 
-    public ObservableCollection<string> RecentFiles { get; } = [];
+    public ObservableCollection<RecentFileViewModel> RecentFiles { get; } = [];
+
+    public ObservableCollection<OpenFlyoutItem> OpenFlyoutItems { get; } = [];
 
     public Func<Task<string?>>? PickGamelistFileAsync { get; set; }
+
+    public Func<Task<string?>>? PickRomFileAsync { get; set; }
 
     public Func<string?, Task<string?>>? PickFolderAsync { get; set; }
 
@@ -182,6 +189,26 @@ public partial class MainViewModel : ViewModelBase
     public Func<string, string?, Task<string?>>? PickMediaFileAsync { get; set; }
 
     public Func<string, string, Task<bool>>? ConfirmAsync { get; set; }
+
+    public Func<Task<ExitDecision>>? ShowExitConfirmAsync { get; set; }
+
+    public Func<IReadOnlyList<BackupInfo>, Task<string?>>? ShowRestoreBackupAsync { get; set; }
+
+    public async Task<ExitDecision> ConfirmExitAsync()
+    {
+        if (!IsDirty)
+        {
+            if (ConfirmAsync is not null && !await ConfirmAsync("Exit Gamelistify", "Close Gamelistify?"))
+                return ExitDecision.Cancel;
+            return ExitDecision.Discard;
+        }
+
+        if (ShowExitConfirmAsync is not null)
+            return await ShowExitConfirmAsync();
+
+        Logger.Warning("Exit confirmation requested before delegate wiring");
+        return ExitDecision.Cancel;
+    }
 
     public bool HasLoadedDocument => _loadedDocument is not null;
 
@@ -243,6 +270,7 @@ public partial class MainViewModel : ViewModelBase
     partial void OnSelectedEntryChanged(GameRowViewModel? value)
     {
         UpdateDetailPane(value);
+        RemoveEntryCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnDetailImageChanged(Bitmap? value)
@@ -290,7 +318,7 @@ public partial class MainViewModel : ViewModelBase
     partial void OnDetailRatingChanged(string value)
     {
         if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var d))
-            DetailRatingValue = double.Clamp(d, 0, 5);
+            DetailRatingValue = double.Clamp(d, 0, 1);
         else
             DetailRatingValue = 0;
         ApplyEditorChanges();
@@ -307,7 +335,10 @@ public partial class MainViewModel : ViewModelBase
     private void SetRating(string? value)
     {
         if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var d))
-            DetailRatingValue = double.Clamp(d, 0, 5);
+        {
+            Logger.Debug("Rating set to {Rating}/5 for {Entry}", d, SelectedEntry?.Name ?? "(none)");
+            DetailRatingValue = double.Clamp(d / 5.0, 0, 1);
+        }
     }
 
     [RelayCommand]
@@ -399,6 +430,8 @@ public partial class MainViewModel : ViewModelBase
     {
         Logger.Verbose("MainViewModel.InitializeAsync start");
         _settings = await SettingsService.LoadAsync(AppPaths.SettingsPath);
+        if (Enum.TryParse<LogEventLevel>(_settings.LogLevel, true, out var persistedLevel))
+            Logger.SetMinimumLevel(persistedLevel);
         ApplyColumnSettings();
         SyncRecentFiles();
         StatusText = "Ready. Open a gamelist.xml file to begin.";
@@ -427,7 +460,7 @@ public partial class MainViewModel : ViewModelBase
         await LoadFileAsync(filePath);
     }
 
-    [RelayCommand(CanExecute = nameof(CanSave))]
+    [RelayCommand(CanExecute = nameof(CanDiscard))]
     private async Task ReloadAsync()
     {
         Logger.Information("Discard requested — reloading current document");
@@ -439,20 +472,238 @@ public partial class MainViewModel : ViewModelBase
         StatusText = "Changes discarded. Reloaded from disk.";
     }
 
+    [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
+    private async Task RestoreBackupAsync()
+    {
+        if (_loadedDocument?.SourcePath is null)
+            return;
+
+        var backups = BackupService.GetBackups(_loadedDocument.SourcePath);
+        if (backups.Count == 0)
+        {
+            StatusText = "No backups found for this gamelist.";
+            return;
+        }
+
+        if (ShowRestoreBackupAsync is null)
+        {
+            Logger.Warning("Restore backup requested before delegate wiring");
+            StatusText = "Restore backup dialog is not wired yet.";
+            return;
+        }
+
+        var backupPath = await ShowRestoreBackupAsync(backups);
+        if (string.IsNullOrEmpty(backupPath))
+        {
+            Logger.Debug("Restore backup cancelled");
+            StatusText = "Restore backup cancelled.";
+            return;
+        }
+
+        var confirmed = ConfirmAsync is null
+            || await ConfirmAsync("Restore backup",
+                $"Restore the gamelist from \"{Path.GetFileName(backupPath)}\"? The current gamelist is backed up first.");
+        if (!confirmed)
+        {
+            StatusText = "Restore backup cancelled.";
+            return;
+        }
+
+        try
+        {
+            Logger.Information("Restoring gamelist from backup {BackupPath}", backupPath);
+            await BackupService.RestoreBackupAsync(_loadedDocument.SourcePath, backupPath);
+            await LoadFileAsync(_loadedDocument.SourcePath);
+            StatusText = $"Restored from {Path.GetFileName(backupPath)}.";
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Restore failed from {BackupPath}", backupPath);
+            StatusText = "Restore failed. Check the log for details.";
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task SaveAsync()
+    {
+        await TrySaveAsync();
+    }
+
+    public async Task<bool> TrySaveAsync()
+    {
+        if (_loadedDocument is null || string.IsNullOrWhiteSpace(_loadedDocument.SourcePath))
+            return false;
+
+        try
+        {
+            Logger.Information("Saving current gamelist to {Path}", _loadedDocument.SourcePath);
+            var backupPath = await GamelistService.SaveAsync(_loadedDocument);
+            IsDirty = false;
+            UpdateWindowTitle();
+            StatusText = backupPath is null
+                ? $"Saved {Path.GetFileName(_loadedDocument.SourcePath)}. No backup created (first save)."
+                : $"Saved {Path.GetFileName(_loadedDocument.SourcePath)}. Backup: {Path.GetFileName(backupPath)}";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Save failed for {Path}", _loadedDocument.SourcePath);
+            StatusText = "Save failed. Check the log for details.";
+            return false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSave))]
+    private async Task OptimizeAsync()
     {
         if (_loadedDocument is null || string.IsNullOrWhiteSpace(_loadedDocument.SourcePath))
             return;
 
-        Logger.Information("Saving current gamelist to {Path}", _loadedDocument.SourcePath);
-        await GamelistService.SaveAsync(_loadedDocument);
+        Logger.Information("Optimizing gamelist to {Path}", _loadedDocument.SourcePath);
+        var backupPath = await GamelistService.SaveAsync(_loadedDocument, compact: true);
         IsDirty = false;
         UpdateWindowTitle();
-        StatusText = $"Saved {Path.GetFileName(_loadedDocument.SourcePath)} with timestamped backup.";
+        StatusText = backupPath is null
+            ? $"Optimized {Path.GetFileName(_loadedDocument.SourcePath)} (minified XML, no backup on first save)."
+            : $"Optimized {Path.GetFileName(_loadedDocument.SourcePath)} (minified XML). Backup: {Path.GetFileName(backupPath)}";
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSave))]
+    private async Task CleanupAsync()
+    {
+        if (_loadedDocument is null)
+            return;
+
+        var invalid = GamelistService.GetInvalidEntries(_loadedDocument);
+        if (invalid.Count == 0)
+        {
+            Logger.Information("Cleanup found no invalid entries");
+            StatusText = "No invalid entries found. All game paths resolve to existing files.";
+            return;
+        }
+
+        Logger.Information("Cleanup found {Count} invalid entries", invalid.Count);
+        var names = string.Join(", ", invalid.Take(5).Select(static entry => entry.Name));
+        if (invalid.Count > 5)
+            names += $" … and {invalid.Count - 5} more";
+
+        var confirmed = ConfirmAsync is null
+            || await ConfirmAsync("Remove invalid entries",
+                $"{invalid.Count} entr{(invalid.Count == 1 ? "y" : "ies")} reference missing files and will be removed: {names}");
+        if (!confirmed)
+        {
+            StatusText = "Cleanup cancelled.";
+            return;
+        }
+
+        foreach (var entry in invalid)
+        {
+            _loadedDocument.RemoveEntry(entry);
+            _allEntries.RemoveAll(row => ReferenceEquals(row.Entry, entry));
+        }
+
+        ApplySearchFilter();
+        SelectedEntry = null;
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = $"Removed {invalid.Count} invalid entr{(invalid.Count == 1 ? "y" : "ies")}.";
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAddEntry))]
+    private async Task AddGameAsync()
+    {
+        if (PickRomFileAsync is null)
+        {
+            Logger.Warning("Add game requested before delegate wiring");
+            StatusText = "Add game action is not wired yet.";
+            return;
+        }
+
+        var filePath = await PickRomFileAsync();
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            Logger.Debug("Add game cancelled");
+            StatusText = "Add game cancelled.";
+            return;
+        }
+
+        if (!File.Exists(filePath))
+        {
+            StatusText = "Selected game file no longer exists.";
+            return;
+        }
+
+        var entry = new GamelistEntry(GamelistEntryKind.Game);
+        entry.SetField("path", ToStoredPath(filePath));
+        entry.SetField("name", Path.GetFileNameWithoutExtension(filePath));
+        Logger.Information("Adding game entry {Name} ({Path})", entry.Name, entry.Path);
+        AddEntryToList(entry);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAddEntry))]
+    private async Task AddFolderAsync()
+    {
+        if (PickFolderAsync is null)
+        {
+            Logger.Warning("Add folder requested before delegate wiring");
+            StatusText = "Add folder action is not wired yet.";
+            return;
+        }
+
+        var baseDirectory = _loadedDocument?.BaseDirectory ?? string.Empty;
+        var folderPath = await PickFolderAsync(baseDirectory);
+        if (string.IsNullOrWhiteSpace(folderPath))
+        {
+            Logger.Debug("Add folder cancelled");
+            StatusText = "Add folder cancelled.";
+            return;
+        }
+
+        var entry = new GamelistEntry(GamelistEntryKind.Folder);
+        entry.SetField("path", ToStoredPath(folderPath));
+        entry.SetField("name", Path.GetFileName(Path.TrimEndingDirectorySeparator(folderPath)));
+        Logger.Information("Adding folder entry {Name} ({Path})", entry.Name, entry.Path);
+        AddEntryToList(entry);
+    }
+
+    private bool CanAddEntry() => _loadedDocument is not null;
+
+    private void AddEntryToList(GamelistEntry entry)
+    {
+        if (_loadedDocument is null)
+            return;
+
+        _loadedDocument.Entries.Add(entry);
+        var row = new GameRowViewModel(entry);
+        _allEntries.Add(row);
+
+        SelectedFilterIndex = 0;
+        SearchText = string.Empty;
+        ApplySearchFilter();
+        SelectedEntry = row;
+
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = $"Added \"{entry.Name}\" to the gamelist.";
+    }
+
+    private string ToStoredPath(string filePath)
+    {
+        var baseDirectory = _loadedDocument?.BaseDirectory ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(baseDirectory))
+            return GamelistPathHelper.NormalizeStoredPath(filePath);
+
+        var relative = Path.GetRelativePath(baseDirectory, filePath).Replace('\\', '/');
+        return relative.StartsWith("..", StringComparison.Ordinal)
+            ? GamelistPathHelper.NormalizeStoredPath(filePath)
+            : $"./{relative}";
     }
 
     private bool CanSave() => HasLoadedDocument;
+
+    private bool CanDiscard() => IsDirty;
+
+    private bool CanRestoreBackup() => HasLoadedDocument;
 
     private bool CanRemove() => HasSelection;
 
@@ -672,26 +923,26 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(CanOpenRecent))]
-    private async Task OpenRecentAsync()
+    private async Task OpenRecentAsync(string? filePath)
     {
-        if (string.IsNullOrWhiteSpace(SelectedRecentFile))
+        if (string.IsNullOrWhiteSpace(filePath))
             return;
 
-        if (!File.Exists(SelectedRecentFile))
+        if (!File.Exists(filePath))
         {
-            Logger.Warning("Recent file missing: {RecentFile}", SelectedRecentFile);
+            Logger.Warning("Recent file missing: {RecentFile}", filePath);
             StatusText = "Recent file no longer exists.";
-            _settings.RecentFiles.RemoveAll(path => path.Equals(SelectedRecentFile, StringComparison.OrdinalIgnoreCase));
+            _settings.RecentFiles.RemoveAll(path => path.Equals(filePath, StringComparison.OrdinalIgnoreCase));
             SyncRecentFiles();
             await SettingsService.SaveAsync(AppPaths.SettingsPath, _settings);
             return;
         }
 
-        Logger.Information("Opening recent file {RecentFile}", SelectedRecentFile);
-        await LoadFileAsync(SelectedRecentFile);
+        Logger.Information("Opening recent file {RecentFile}", filePath);
+        await LoadFileAsync(filePath);
     }
 
-    private bool CanOpenRecent() => !string.IsNullOrWhiteSpace(SelectedRecentFile);
+    private static bool CanOpenRecent(string? filePath) => !string.IsNullOrWhiteSpace(filePath);
 
     [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
     private void HideSelected()
@@ -721,28 +972,35 @@ public partial class MainViewModel : ViewModelBase
 
     private void ApplySearchFilter()
     {
-        var search = SearchText.Trim();
-        IEnumerable<GameRowViewModel> filtered = _allEntries;
-
-        if (SelectedFilterIndex == 1)
-            filtered = filtered.Where(static entry => entry.Entry.Kind == GamelistEntryKind.Game);
-        else if (SelectedFilterIndex == 2)
-            filtered = filtered.Where(static entry => entry.Entry.Kind == GamelistEntryKind.Folder);
-
-        if (!string.IsNullOrWhiteSpace(search))
+        var matching = _allEntries.Where(MatchesFilter).ToList();
+        if (VisibleEntries.SequenceEqual(matching))
         {
-            filtered = filtered.Where(entry =>
-                entry.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || entry.Genre.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || entry.Developer.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || entry.Path.Contains(search, StringComparison.OrdinalIgnoreCase));
+            EntryCountText = $"{VisibleEntries.Count} visible / {_allEntries.Count} total";
+            return;
         }
 
         VisibleEntries.Clear();
-        foreach (var entry in filtered)
+        foreach (var entry in matching)
             VisibleEntries.Add(entry);
 
         EntryCountText = $"{VisibleEntries.Count} visible / {_allEntries.Count} total";
+    }
+
+    private bool MatchesFilter(GameRowViewModel row)
+    {
+        if (SelectedFilterIndex == 1 && row.Entry.Kind != GamelistEntryKind.Game)
+            return false;
+        if (SelectedFilterIndex == 2 && row.Entry.Kind != GamelistEntryKind.Folder)
+            return false;
+
+        var search = SearchText.Trim();
+        if (string.IsNullOrWhiteSpace(search))
+            return true;
+
+        return row.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Genre.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Developer.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || row.Path.Contains(search, StringComparison.OrdinalIgnoreCase);
     }
 
     private void UpdateDetailPane(GameRowViewModel? row)
@@ -959,6 +1217,13 @@ public partial class MainViewModel : ViewModelBase
         Logger.Information("Loaded {Count} entries from {FilePath}", _allEntries.Count, filePath);
         OnPropertyChanged(nameof(HasLoadedDocument));
         SaveCommand.NotifyCanExecuteChanged();
+        RemoveEntryCommand.NotifyCanExecuteChanged();
+        ReloadCommand.NotifyCanExecuteChanged();
+        RestoreBackupCommand.NotifyCanExecuteChanged();
+        AddGameCommand.NotifyCanExecuteChanged();
+        AddFolderCommand.NotifyCanExecuteChanged();
+        OptimizeCommand.NotifyCanExecuteChanged();
+        CleanupCommand.NotifyCanExecuteChanged();
         OpenRecentCommand.NotifyCanExecuteChanged();
         HideSelectedCommand.NotifyCanExecuteChanged();
         UnhideSelectedCommand.NotifyCanExecuteChanged();
@@ -973,9 +1238,14 @@ public partial class MainViewModel : ViewModelBase
     {
         RecentFiles.Clear();
         foreach (var recentFile in _settings.RecentFiles)
-            RecentFiles.Add(recentFile);
+            RecentFiles.Add(new RecentFileViewModel(recentFile));
 
-        SelectedRecentFile = RecentFiles.FirstOrDefault();
+        OpenFlyoutItems.Clear();
+        OpenFlyoutItems.Add(new OpenFlyoutItem("Open File...", OpenCommand));
+        OpenFlyoutItems.Add(new OpenFlyoutItem("-"));
+        foreach (var recent in RecentFiles)
+            OpenFlyoutItems.Add(new OpenFlyoutItem(recent.DisplayName, OpenRecentCommand, recent.FullPath, recent.FullPath));
+
         OnPropertyChanged(nameof(HasRecentFiles));
         OpenRecentCommand.NotifyCanExecuteChanged();
     }

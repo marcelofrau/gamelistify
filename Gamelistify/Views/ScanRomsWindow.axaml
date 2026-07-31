@@ -33,13 +33,13 @@
       <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
         <Button Grid.Column="0" Classes="command-button" Command="{Binding SelectAllCommand}" ToolTip.Tip="Check all found ROMs for addition">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconCheck}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-ok-32.png" />
             <TextBlock Text="Select All" />
           </StackPanel>
         </Button>
         <Button Grid.Column="1" Classes="command-button" Command="{Binding ClearSelectionCommand}" ToolTip.Tip="Uncheck all ROMs">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
             <TextBlock Text="Clear" />
           </StackPanel>
         </Button>
@@ -47,13 +47,13 @@
         <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="10">
           <Button Classes="command-button primary" Command="{Binding AcceptCommand}" Click="OnAddClick" ToolTip.Tip="Add checked ROMs to the gamelist">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <Path Classes="dialog-icon" Data="{StaticResource IconPlus}" />
+              <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-add-32.png" />
               <TextBlock Text="Add Selected" />
             </StackPanel>
           </Button>
           <Button Classes="command-button" Click="OnCancelClick" ToolTip.Tip="Discard scan results">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <Path Classes="dialog-icon" Data="{StaticResource IconX}" />
+              <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
               <TextBlock Text="Cancel" />
             </StackPanel>
           </Button>

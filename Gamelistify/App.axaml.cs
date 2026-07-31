@@ -62,6 +62,25 @@ public partial class App : Application
                 return path;
             };
 
+            mainViewModel.PickRomFileAsync = async () =>
+            {
+                Logger.Debug("ROM file picker requested");
+                IStorageFolder? suggestedStartLocation = null;
+                if (!string.IsNullOrWhiteSpace(mainViewModel.CurrentFilePath))
+                    suggestedStartLocation = await mainWindow.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(mainViewModel.CurrentFilePath) ?? string.Empty);
+
+                var files = await mainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = "Select game file",
+                    AllowMultiple = false,
+                    SuggestedStartLocation = suggestedStartLocation,
+                });
+
+                var path = files.Count > 0 ? files[0].TryGetLocalPath() : null;
+                Logger.Debug("ROM file picker result: {Path}", path ?? "<none>");
+                return path;
+            };
+
             mainViewModel.PickFolderAsync = async suggestedPath =>
             {
                 Logger.Debug("Open folder dialog requested. Suggested: {Path}", suggestedPath ?? "<none>");
@@ -162,7 +181,7 @@ public partial class App : Application
                     LastGamelistDirectory = currentSettings.LastGamelistDirectory,
                     Theme = currentSettings.Theme,
                     ImagePreviewSize = currentSettings.ImagePreviewSize,
-                    DebugLogging = currentSettings.DebugLogging,
+                    LogLevel = currentSettings.LogLevel,
                     RecentFiles = [.. currentSettings.RecentFiles],
                     ColumnsVisible = currentSettings.ColumnsVisible,
                 };
@@ -186,6 +205,30 @@ public partial class App : Application
                 var result = await confirmWindow.ShowDialog<bool>(mainWindow);
                 Logger.Debug("Confirmation result: {Result}", result);
                 return result;
+            };
+
+            mainViewModel.ShowExitConfirmAsync = () =>
+            {
+                Logger.Information("Showing exit confirmation dialog");
+                var exitWindow = new ExitConfirmWindow
+                {
+                    DataContext = new ExitConfirmViewModel
+                    {
+                        Title = "Exit Gamelistify",
+                        Message = "You have unsaved changes. Save and exit, or exit without saving?",
+                    },
+                };
+                return exitWindow.ShowDialog<ExitDecision>(mainWindow);
+            };
+
+            mainViewModel.ShowRestoreBackupAsync = backups =>
+            {
+                Logger.Information("Showing restore backup window with {Count} backups", backups.Count);
+                var restoreWindow = new RestoreBackupWindow
+                {
+                    DataContext = new RestoreBackupViewModel(backups),
+                };
+                return restoreWindow.ShowDialog<string?>(mainWindow);
             };
 
             mainViewModel.ReviewScannedRomsAsync = async (items, directory) =>

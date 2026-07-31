@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:Gamelistify.Models"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        x:Class="Gamelistify.Views.RestoreBackupWindow"
+        x:DataType="vm:RestoreBackupViewModel"
+        Title="Restore Backup"
+        Width="620"
+        Height="420"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="16">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+      <StackPanel Spacing="4">
+        <TextBlock Classes="section-title" Text="Restore Backup" />
+        <TextBlock Classes="muted" Text="Select a backup to restore. The current gamelist is backed up first." TextWrapping="Wrap" />
+      </StackPanel>
+
+      <Grid Grid.Row="1">
+        <Border Classes="panel" Padding="0">
+          <ListBox ItemsSource="{Binding Backups}"
+                   SelectedItem="{Binding SelectedBackup, Mode=TwoWay}"
+                   IsEnabled="{Binding HasBackups}"
+                   MaxHeight="280">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="models:BackupInfo">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                  <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-restore-32.png" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding DisplayTime}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Classes="muted" Text="{Binding SizeDisplay}" VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+        <TextBlock Classes="muted" Text="No backups found." IsVisible="{Binding ShowEmptyMessage}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Grid>
+
+      <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Classes="command-button" Click="OnCancelClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
+            <TextBlock Text="Cancel" />
+          </StackPanel>
+        </Button>
+        <Button Classes="command-button primary" IsEnabled="{Binding HasSelection}" Click="OnRestoreClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-restore-32.png" />
+            <TextBlock Text="Restore" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

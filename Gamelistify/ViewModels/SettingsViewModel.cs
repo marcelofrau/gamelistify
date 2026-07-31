@@ -58,11 +58,17 @@ public partial class SettingsViewModel : ViewModelBase
         settings.ScreenScraperUser = ScreenScraperUser.Trim();
         settings.ScreenScraperPassword = ScreenScraperPassword;
         settings.ImagePreviewSize = ImagePreviewSize;
+        settings.LogLevel = LogLevelOptions[SelectedLogLevelIndex];
     }
 
     [RelayCommand]
     private void Save()
     {
+        Logger.Information("Settings save requested. LogLevel={Level}, SkyscraperBinary={Binary}, ScreenScraperUser={User}, ImagePreviewSize={Size}",
+            LogLevelOptions[SelectedLogLevelIndex],
+            string.IsNullOrWhiteSpace(SkyscraperBinaryPath) ? "(none)" : SkyscraperBinaryPath,
+            string.IsNullOrWhiteSpace(ScreenScraperUser) ? "(none)" : ScreenScraperUser,
+            ImagePreviewSize);
         var levelName = LogLevelOptions[SelectedLogLevelIndex];
         if (Enum.TryParse<LogEventLevel>(levelName, out var level))
             Logger.SetMinimumLevel(level);

@@ -60,14 +60,38 @@ public sealed class GamelistService
         return gamelist;
     }
 
-    public static async Task SaveAsync(GamelistDocument document, string? destinationPath = null, bool createBackup = true, CancellationToken cancellationToken = default)
+    public static List<GamelistEntry> GetInvalidEntries(GamelistDocument document)
+    {
+        var invalid = new List<GamelistEntry>();
+        foreach (var entry in document.Entries)
+        {
+            if (entry.Kind == GamelistEntryKind.Folder)
+                continue;
+
+            var storedPath = entry.GetField("path");
+            if (string.IsNullOrWhiteSpace(storedPath))
+            {
+                invalid.Add(entry);
+                continue;
+            }
+
+            var absolutePath = GamelistPathHelper.ResolveToAbsolutePath(storedPath, document.BaseDirectory);
+            if (absolutePath is null || !File.Exists(absolutePath))
+                invalid.Add(entry);
+        }
+
+        return invalid;
+    }
+
+    public static async Task<string?> SaveAsync(GamelistDocument document, string? destinationPath = null, bool createBackup = true, bool compact = false, CancellationToken cancellationToken = default)
     {
         var outputPath = destinationPath ?? document.SourcePath ?? throw new InvalidOperationException("Destination path is required.");
         Logger.Verbose("SaveAsync: {EntryCount} entries to save", document.Entries.Count);
         Logger.Information("Saving gamelist XML to {OutputPath}. Backup enabled={BackupEnabled}", outputPath, createBackup);
 
+        string? backupPath = null;
         if (createBackup && File.Exists(outputPath))
-            await BackupService.CreateBackupAsync(outputPath, cancellationToken: cancellationToken);
+            backupPath = await BackupService.CreateBackupAsync(outputPath, cancellationToken: cancellationToken);
 
         var root = new XElement(document.RootElementName);
         foreach (var entry in document.Entries)
@@ -97,7 +121,7 @@ public sealed class GamelistService
         {
             Async = true,
             Encoding = new System.Text.UTF8Encoding(false),
-            Indent = true,
+            Indent = !compact,
             NewLineChars = Environment.NewLine,
         };
 
@@ -107,5 +131,6 @@ public sealed class GamelistService
         xDocument.Save(writer);
         await writer.FlushAsync();
         Logger.Information("Saved {EntryCount} entries to {OutputPath}", document.Entries.Count, outputPath);
+        return backupPath;
     }
 }

@@ -4,7 +4,7 @@
         x:DataType="vm:ConfirmViewModel"
         xmlns:vm="using:Gamelistify.ViewModels"
         Title="{Binding Title}"
-        Width="440"
+        Width="470"
         SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
@@ -13,8 +13,18 @@
       <TextBlock Text="{Binding Title}" Classes="section-title" FontSize="18" />
       <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
       <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-        <Button Grid.Column="1" MinWidth="100" Classes="command-button" Click="OnNoClick" Content="No" />
-        <Button Grid.Column="2" MinWidth="100" Classes="command-button primary" Click="OnYesClick" Content="Yes" />
+        <Button Grid.Column="1" MinWidth="100" Classes="command-button" Click="OnNoClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-remove-32.png" />
+            <TextBlock Text="No" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="2" MinWidth="100" Classes="command-button primary" Click="OnYesClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-ok-32.png" />
+            <TextBlock Text="Yes" />
+          </StackPanel>
+        </Button>
       </Grid>
     </StackPanel>
   </Border>

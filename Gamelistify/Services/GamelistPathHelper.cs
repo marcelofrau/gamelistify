@@ -17,6 +17,23 @@ public static class GamelistPathHelper
         return $"./{normalized.TrimStart('/')}";
     }
 
+    public static string? ResolveToAbsolutePath(string storedPath, string baseDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(storedPath))
+            return null;
+
+        var normalized = storedPath.Replace('\\', '/').Trim();
+        if (normalized.StartsWith("~/", StringComparison.Ordinal))
+            return Path.GetFullPath(Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                normalized[2..]));
+
+        if (Path.IsPathRooted(normalized))
+            return Path.GetFullPath(normalized);
+
+        return Path.GetFullPath(Path.Combine(baseDirectory, normalized));
+    }
+
     public static string GetEntryStem(string entryPath)
     {
         if (string.IsNullOrWhiteSpace(entryPath))
