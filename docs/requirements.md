@@ -11,10 +11,10 @@ title: Requirements
 |----|-------------|--------|
 | F01 | User can open an existing `gamelist.xml` file from disk | v1.0 |
 | F02 | User can inspect games and folders in a searchable desktop list | v1.0 |
-| F03 | User can view metadata details and image preview for current selection | v1.0 |
+| F03 | User can view metadata details and image preview for the current selection | v1.0 |
 | F04 | User can edit supported metadata fields for a single entry | v1.0 |
 | F05 | User can apply bulk actions to multiple selected entries | v1.0 |
-| F06 | User can scan ROM directories and add missing entries to current gamelist | v1.0 |
+| F06 | User can scan ROM directories and add missing entries to the current gamelist | v1.0 |
 | F07 | User can configure and launch Skyscraper scraping workflows | v1.0 |
 | F08 | User can see live scrape log output and cancel long-running jobs | v1.0 |
 | F09 | User can save changes and receive a timestamped backup before overwrite | v1.0 |
@@ -22,6 +22,10 @@ title: Requirements
 | F11 | Application supports EmulationStation, RetroBat, Batocera, and ES-DE conventions | v1.0 |
 | F12 | User can toggle visible columns and sort the main list | v1.0 |
 | F13 | User can refresh the current view after scrape or scan operations | v1.0 |
+| F14 | User can discard unsaved changes and reload the gamelist from disk | v1.0 |
+| F15 | User can restore the gamelist from any timestamped backup, with a safety backup taken first | v1.0 |
+| F16 | User can set a star rating on entries with a clickable 5-star control | v1.0 |
+| F17 | User can detect and review media files that no entry references (orphan media) | v1.0 |
 
 ## Non-Functional
 
@@ -38,6 +42,8 @@ title: Requirements
 | NF09 | Every write operation creates a timestamped backup artifact before replacement | High |
 | NF10 | UI has a distinct identity inspired by scraper tools, but not visually derivative | High |
 | NF11 | Project ships under GPL-3.0-only | High |
+| NF12 | All UI icons come from the Numix icon theme (GPL-3.0) and are redistributable | High |
+| NF13 | Backup storage lives in a hidden `gamelists_backup` folder next to the gamelist | High |
 
 ## Explicit Scope Decisions
 
@@ -45,3 +51,5 @@ title: Requirements
 - Embedded video preview is out of scope for v1.0.
 - Perfect round-trip formatting preservation is out of scope for v1.0.
 - XML safety and backup behavior are mandatory.
+- Restore is always safe: a backup of the current file is created before applying a restore.
+- Prebuilt release binaries are not yet published; distribution happens through GitHub Releases.

@@ -10,12 +10,16 @@ Gamelistify is a GPL-licensed desktop tool for managing `gamelist.xml` libraries
 
 ## Start Here
 
-- [Master Checklist](checklists/master-checklist)
 - [Requirements](requirements)
+- [Feature Specifications](specs)
 - [Architecture](architecture)
-- [Theme](theme)
 - [Roadmap](roadmap)
+- [Theme](theme)
 - [XML Compatibility](xml-compatibility)
+- [Packaging](packaging)
+- [Assets Guide](assets-guide)
+- [Attributions](attributions)
+- [Master Checklist](checklists/master-checklist)
 
 ## Documentation Goals
 

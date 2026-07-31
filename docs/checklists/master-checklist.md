@@ -45,7 +45,6 @@ title: Master Checklist
 - [x] Add recent files support
 - [x] Add settings window (log level combo, taller)
 - [x] Add Quick Tips flyout (green, styled FlyoutPresenter)
-- [x] Replace toolbar icons with personal icons8 set
 - [x] Add star rating control (5 clickable stars)
 - [x] Add confirmation dialogs (discard, remove)
 - [x] Add remove entry from detail view
@@ -63,6 +62,15 @@ title: Master Checklist
 - [x] Implement cancel handling
 - [x] Implement post-scrape refresh flow
 
+## Phase 4.5 - Safety and Recovery
+
+- [x] Hidden `gamelists_backup` folder next to the gamelist
+- [x] Backup listing (date/time + size, newest first)
+- [x] Restore-from-backup picker window
+- [x] Safety backup before restore
+- [x] Revert (discard + reload), enabled only while dirty
+- [x] Backup tests (naming, listing, restore) and service tests
+
 ## Phase 5 - OSS Polish
 
 - [x] Add release build scripts
@@ -70,6 +78,8 @@ title: Master Checklist
 - [ ] Add screenshots
 - [x] Expand docs for website publishing
 - [x] Add contribution templates
+- [x] Numix icon theme integration (GPL-3.0, attribution)
+- [x] Replace monochrome dialog icons with colored Numix renders
 
 ## Phase 6 - Feature Parity Gaps
 
@@ -82,3 +92,10 @@ title: Master Checklist
 - [x] Add progress parsing (percent / ratio / current game) with progress bar
 - [x] Add platform auto-detection from base directory
 - [ ] Add screenshots (deferred)
+
+## Phase 7 - Pre-1.0 Hardening
+
+- [ ] First tagged release with prebuilt binaries
+- [ ] End-to-end smoke testing on all three platforms
+- [ ] Backup retention policy (cap number of backups)
+- [ ] Performance pass on large gamelists

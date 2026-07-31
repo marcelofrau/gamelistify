@@ -13,7 +13,7 @@ title: Phase 3 Editing Workflow Checklist
 - [x] Add column visibility persistence
 - [x] Add file menu style recent file reopening
 - [x] Add Quick Tips flyout (green theme, styled FlyoutPresenter)
-- [x] Replace toolbar icons with personal icons8 3d/fluency set
+- [x] Replace toolbar icons with Numix theme colored renders (GPL-3.0)
 - [x] Add star rating control (5 clickable stars, IconStar geometry, BoolToStarBrush)
 - [x] Add confirmation dialogs (discard, remove via ConfirmWindow)
 - [x] Add remove entry from detail view
