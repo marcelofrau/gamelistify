@@ -147,11 +147,6 @@
     </Style>
   </Style>
 
-  <Style Selector="Button.command-button.toolbar-button.chevron-button">
-    <Setter Property="Width" Value="26" />
-    <Setter Property="Padding" Value="0" />
-  </Style>
-
   <Style Selector="Button.command-button.toolbar-button:disabled">
     <Setter Property="Opacity" Value="1" />
     <Setter Property="Background" Value="{StaticResource WorkbenchToolbarBg}" />
@@ -370,5 +365,19 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="6" />
     <Setter Property="Padding" Value="4" />
+  </Style>
+
+  <Style Selector="Border.about-chip">
+    <Setter Property="Background" Value="#3A332B" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="10,3" />
+    <Setter Property="BorderBrush" Value="{StaticResource WorkbenchBorderSoft}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <Style Selector="Border.about-chip TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource WorkbenchAccentGlow}" />
   </Style>
 </Styles>

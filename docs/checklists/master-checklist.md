@@ -93,6 +93,19 @@ title: Master Checklist
 - [x] Add platform auto-detection from base directory
 - [ ] Add screenshots (deferred)
 
+## Phase 6.5 - Library Hygiene and Save Workflow
+
+- [x] Add Save As (Save flyout, retargets the document to the new file)
+- [x] Add Show Hidden toggle in the filter row
+- [x] Add grid shortcuts (Ctrl+A select all, Ctrl+I invert selection, H/F/U/G)
+- [x] Add Set Name from Filename bulk command
+- [x] Add Batch Favorite by Names window
+- [x] Add Detect & Hide Duplicates plan + preview window
+- [x] Add Detect & Hide Bad Versions plan + preview window
+- [x] Add Review Hidden & Favorites (auto-unhide candidates)
+- [x] Add Tools flyout with library utilities
+- [x] Add LibraryHygieneService tests
+
 ## Phase 7 - Pre-1.0 Hardening
 
 - [ ] First tagged release with prebuilt binaries

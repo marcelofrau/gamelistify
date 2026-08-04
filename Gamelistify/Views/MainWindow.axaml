@@ -26,31 +26,50 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="0">
         <Border Grid.Row="0" Classes="toolbar-shell" Padding="8,6" Margin="0">
-            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="0">
-                <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="0">
-                    <Button Classes="command-button toolbar-button" Command="{Binding OpenCommand}" ToolTip.Tip="Open a gamelist.xml file">
-                        <StackPanel Spacing="4">
-                            <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
-                            <TextBlock Classes="toolbar-label" Text="Open" />
-                        </StackPanel>
-                    </Button>
-                    <Button Grid.Column="1" Classes="command-button toolbar-button chevron-button" ToolTip.Tip="Open recent files">
-                        <Button.Flyout>
-                            <MenuFlyout ItemsSource="{Binding OpenFlyoutItems}">
-                                <MenuFlyout.ItemContainerTheme>
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="0">
+                <Button Grid.Column="0" Classes="command-button toolbar-button" ToolTip.Tip="Open a gamelist.xml file or a recent one">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Open File..." Command="{Binding OpenCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Open Recent" ItemsSource="{Binding OpenFlyoutItems}" IsEnabled="{Binding HasRecentFiles}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-recent-32.png" />
+                                </MenuItem.Icon>
+                                <MenuItem.ItemContainerTheme>
                                     <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="vm:OpenFlyoutItem">
                                         <Setter Property="Header" Value="{Binding Header}" />
                                         <Setter Property="Command" Value="{Binding Command}" />
                                         <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
                                         <Setter Property="ToolTip.Tip" Value="{Binding ToolTip}" />
                                     </ControlTheme>
-                                </MenuFlyout.ItemContainerTheme>
-                            </MenuFlyout>
-                        </Button.Flyout>
-                        <Path Data="{StaticResource IconChevronDown}" Width="12" Height="12" Fill="#22160E" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Button>
-                </Grid>
-                <Button Grid.Column="1" Classes="command-button toolbar-button" Command="{Binding SaveCommand}" ToolTip.Tip="Save current gamelist and create a backup">
+                                </MenuItem.ItemContainerTheme>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-open-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Open" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1" Classes="command-button toolbar-button" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedDocument}" ToolTip.Tip="Save current gamelist and create a backup">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Save" Command="{Binding SaveCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Save As..." Command="{Binding SaveAsCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-save-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Save" />
@@ -160,13 +179,48 @@
                         <TextBlock Classes="toolbar-label" Text="Optimize" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="19" Classes="command-button toolbar-button" Command="{Binding OpenSettingsCommand}" HorizontalAlignment="Right" ToolTip.Tip="Open application settings">
+                <Button Grid.Column="18" Classes="command-button toolbar-button" ToolTip.Tip="Library tools: duplicates, bad versions, batch operations">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="Set Name from Filename" Command="{Binding SetNameFromFilenameCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-folder-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Batch Favorite by Names..." Command="{Binding BatchFavoriteCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-favorite-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Detect &amp; Hide Duplicates..." Command="{Binding DetectDuplicatesCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-hide-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Detect &amp; Hide Bad Versions..." Command="{Binding DetectBadVersionsCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-hide-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Review Hidden &amp; Favorites..." Command="{Binding ReviewHiddenFavoritesCommand}">
+                                <MenuItem.Icon>
+                                    <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-unhide-32.png" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <StackPanel Spacing="4">
+                        <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-tools-32.png" />
+                        <TextBlock Classes="toolbar-label" Text="Tools" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="20" Classes="command-button toolbar-button" Command="{Binding OpenSettingsCommand}" HorizontalAlignment="Right" ToolTip.Tip="Open application settings">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-settings-32.png" />
                         <TextBlock Classes="toolbar-label" Text="Settings" />
                     </StackPanel>
                 </Button>
-                <Button Grid.Column="20" Classes="command-button toolbar-button" Command="{Binding OpenAboutCommand}" HorizontalAlignment="Right" ToolTip.Tip="Show version, license, and project links">
+                <Button Grid.Column="21" Classes="command-button toolbar-button" Command="{Binding OpenAboutCommand}" HorizontalAlignment="Right" ToolTip.Tip="Show version, license, and project links">
                     <StackPanel Spacing="4">
                         <Image Classes="toolbar-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-about-32.png" />
                         <TextBlock Classes="toolbar-label" Text="About" />
@@ -175,7 +229,7 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="16,12,16,0">
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Margin="16,12,16,0">
             <Grid>
                 <TextBox x:Name="SearchBox" Text="{Binding SearchText}" PlaceholderText="Search by name, genre, developer..." Padding="32,0,0,0" />
                 <Path Data="{StaticResource IconSearch}"
@@ -192,6 +246,10 @@
                       ItemsSource="{Binding FilterOptions}"
                       SelectedIndex="{Binding SelectedFilterIndex, Mode=TwoWay}"
                       Width="160" />
+            <CheckBox Grid.Column="2"
+                      Content="Show Hidden"
+                      IsChecked="{Binding ShowHiddenEntries, Mode=TwoWay}"
+                      VerticalAlignment="Center" />
         </Grid>
 
         <Grid Grid.Row="2" ColumnDefinitions="*,6,420" ColumnSpacing="0" Margin="16,12,16,0">
@@ -427,6 +485,13 @@
                 </Button>
             </Grid>
         </Border>
+
+        <Border x:Name="DialogDimOverlay"
+                Grid.RowSpan="4"
+                ZIndex="100"
+                Background="#66000000"
+                IsHitTestVisible="False"
+                IsVisible="False" />
     </Grid>
 
 </Window>

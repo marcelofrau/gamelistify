@@ -1,14 +1,12 @@
 <Project>
   <PropertyGroup>
     <VersionMajor>0</VersionMajor>
-    <VersionMinor>1</VersionMinor>
-    <VersionPatch>0</VersionPatch>
-    <BuildNumber>1</BuildNumber>
+    <VersionMinor>9</VersionMinor>
+    <VersionPatch>9</VersionPatch>
     <VersionPrefix>$(VersionMajor).$(VersionMinor).$(VersionPatch)</VersionPrefix>
     <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
     <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
     <AssemblyVersion>$(VersionMajor).$(VersionMinor).0.0</AssemblyVersion>
-    <FileVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch).$(BuildNumber)</FileVersion>
-    <InformationalVersion>$(Version)+build.$(BuildNumber)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 </Project>

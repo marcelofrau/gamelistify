@@ -2,7 +2,7 @@ namespace Gamelistify.Models;
 
 public sealed class GamelistDocument
 {
-    public string? SourcePath { get; init; }
+    public string? SourcePath { get; set; }
 
     public string RootElementName { get; init; } = "gameList";
 

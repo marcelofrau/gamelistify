@@ -3,8 +3,8 @@
 Avalonia 12 / .NET 8 desktop editor for EmulationStation `gamelist.xml` libraries. Build per-csproj: `dotnet build Gamelistify\Gamelistify.csproj`. Tests: `dotnet test Gamelistify.Tests\Gamelistify.Tests.csproj`. User runs/tests the app manually.
 
 ## Icons
-- All images come from the Numix theme. Local clone: `F:\workspace\numix-icon-theme\` (outside this repo).
-  - Colored icons: `F:\workspace\numix-icon-theme\Numix\32\` (and `Numix\scalable\` SVG sources). Monochrome symbolic: `Numix\scalable\actions\*-symbolic.svg`, light variant `Numix-Light\scalable\`.
+- All images come from the Numix theme. Local clone: `D:\workspace\numix-icon-theme\` (outside this repo).
+  - Colored icons: `D:\workspace\numix-icon-theme\Numix\32\` (and `Numix\scalable\` SVG sources). Monochrome symbolic: `Numix\scalable\actions\*-symbolic.svg`, light variant `Numix-Light\scalable\`.
   - License GPL-3.0 — matches this app's license. Always extract from the local clone before hand-drawing geometry.
   - Prefer colored Numix icons over monochrome. Dialog and toolbar buttons use colored renders (PNG, 32px source scaled to the button size).
 - Toolbar/status/dialog button images are PNG files under `Assets\Views\MainWindow\` named `mainwindow-*.png`, referenced via `avares://Gamelistify/Assets/Views/MainWindow/<name>.png`.

@@ -25,7 +25,10 @@ public static class BuildInfo
         get
         {
             var plusIndex = InformationalVersion.IndexOf('+');
-            return plusIndex >= 0 ? InformationalVersion[(plusIndex + 1)..] : "build.0";
+            var label = plusIndex >= 0 ? InformationalVersion[(plusIndex + 1)..] : null;
+            return string.IsNullOrWhiteSpace(label)
+                ? "Build 0"
+                : label.Replace("build.", "Build ", StringComparison.Ordinal);
         }
     }
 }

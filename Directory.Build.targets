@@ -1,0 +1,13 @@
+<Project>
+  <Target Name="ComputeBuildNumber" BeforeTargets="GetAssemblyAttributes">
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="CommitCount" />
+    </Exec>
+    <PropertyGroup>
+      <BuildNumber Condition="'$(CommitCount)' != ''">$(CommitCount)</BuildNumber>
+      <BuildNumber Condition="'$(BuildNumber)' == ''">1</BuildNumber>
+      <FileVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch).$(BuildNumber)</FileVersion>
+      <InformationalVersion>$(Version)+build.$(BuildNumber)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+</Project>

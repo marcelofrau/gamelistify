@@ -138,3 +138,60 @@ the observable behavior, the owning service/view-model, and the acceptance crite
 - Opened files are tracked (bounded) and shown under the Open flyout.
 - Recent files are persisted across sessions.
 - Selecting a recent file reopens it; entries that no longer exist are skipped.
+
+## Save As
+
+**Owners:** `MainViewModel` (`SaveAsAsync`), `App` (file picker wiring)
+
+- The toolbar **Save** button opens a flyout with **Save** and **Save As...**.
+- Save As retargets the document: the new path becomes `SourcePath` and is used
+  for subsequent saves, backups, and recent-file registration.
+- The suggested file name is the current file name (or `gamelist.xml` when nothing
+  is loaded) and the picker filters to `*.xml`.
+- Saving to the new location writes a backup next to it.
+
+## Library Hygiene
+
+**Owners:** `LibraryHygieneService`, `HygienePlan`, `HygienePlanViewModel`,
+`MainViewModel` (`DetectDuplicatesAsync`, `DetectBadVersionsAsync`,
+`ReviewHiddenFavoritesAsync`, `BatchFavoriteAsync`, `SetNameFromFilename`)
+
+### Detect & Hide Duplicates
+
+- Entries are grouped by base name (name with parenthesized tags stripped).
+- Groups with more than one game are reduced to a single keeper: the one with the
+  highest region priority (USA > Japan > Brazil > Europe), then alphabetically.
+- A preview window shows the kept and hidden lists before anything is applied.
+- On apply, hidden entries get `hidden=true`; favorites among hidden entries are
+  transferred to the keeper. Folders are ignored.
+
+### Detect & Hide Bad Versions
+
+- Within each base-name group, versions tagged with a bad token (`beta`, `demo`,
+  `prototype`, `preview`, `sample`, `unlicensed`, `hack`, `homebrew`, `kiosk`,
+  `unknown`, `bios`, `!`) are hidden.
+- When several good versions exist, the one with the highest `(Rev N)` is kept.
+- If every version is bad, the highest revision is kept.
+- Favorites among hidden entries transfer to the keeper; a preview window is shown
+  before applying.
+
+### Review Hidden & Favorites
+
+- For each base-name group, hidden entries that would be worth revealing are found:
+  groups that are entirely hidden, and hidden favorites.
+- Candidates are shown for confirmation and then unhidden.
+
+### Batch Favorite by Names
+
+- A window accepts one game name per line; matching entries (case-insensitive)
+  are favorited.
+
+### Set Name from Filename
+
+- For each selected entry, `name` is set to the file name without extension.
+
+### Acceptance criteria
+
+- Duplicates and bad-version plans never modify the document until applied.
+- Favorite transfer only happens during apply, never during preview.
+- All plan outputs are deterministic and covered by automated tests.

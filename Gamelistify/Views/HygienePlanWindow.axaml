@@ -1,0 +1,61 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Gamelistify.Views.HygienePlanWindow"
+        x:DataType="vm:HygienePlanViewModel"
+        xmlns:vm="using:Gamelistify.ViewModels"
+        Title="{Binding Title}"
+        Width="820"
+        Height="560"
+        WindowStartupLocation="CenterOwner">
+  <Border Margin="16" Classes="panel" Padding="18">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14">
+      <TextBlock Classes="section-title" FontSize="18" Text="{Binding Title}" />
+      <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" />
+      <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="14">
+        <Grid RowDefinitions="Auto,*" RowSpacing="6">
+          <TextBlock Classes="muted" Text="Entries to keep visible" />
+          <ListBox Grid.Row="1"
+                   ItemsSource="{Binding KeepVisible}"
+                   Background="#151413"
+                   BorderBrush="#3A3735"
+                   BorderThickness="1">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+        <Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,*" RowSpacing="6">
+          <TextBlock Classes="muted" Text="Entries to hide" />
+          <ListBox Grid.Row="1"
+                   ItemsSource="{Binding ToHide}"
+                   Background="#151413"
+                   BorderBrush="#3A3735"
+                   BorderThickness="1">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Grid>
+      <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" Classes="muted" Text="Favorites among hidden entries will be transferred to the kept entry." TextWrapping="Wrap" />
+        <Button Grid.Column="1" MinWidth="100" Classes="command-button" Click="OnCancelClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-close-32.png" />
+            <TextBlock Text="Cancel" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="2" MinWidth="100" Classes="command-button primary" Command="{Binding AcceptCommand}" Click="OnApplyClick">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-ok-32.png" />
+            <TextBlock Text="Apply" />
+          </StackPanel>
+        </Button>
+      </Grid>
+    </Grid>
+  </Border>
+</Window>

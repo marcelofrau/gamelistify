@@ -4,52 +4,172 @@
         x:Class="Gamelistify.Views.AboutWindow"
         x:DataType="vm:AboutViewModel"
         Title="About Gamelistify"
-        Width="520"
-        Height="420"
+        Width="600"
+        Height="600"
+        MinWidth="600"
+        MinHeight="600"
         CanResize="False"
+        Background="{StaticResource WorkbenchSurface}"
         WindowStartupLocation="CenterOwner">
-  <Border Margin="16" Classes="panel" Padding="18">
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="12">
-      <TextBlock Grid.Row="0" Classes="section-title" Text="{Binding ProjectName}" FontSize="24" />
-      <TextBlock Grid.Row="1" Text="{Binding Description}" TextWrapping="Wrap" />
 
-      <Grid Grid.Row="2" ColumnDefinitions="Auto,*" ColumnSpacing="10">
-        <TextBlock Text="Version" Classes="muted" />
-        <TextBlock Grid.Column="1" Text="{Binding Version}" />
+  <Grid>
+    <Border>
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Offset="0" Color="#2E2D2B" />
+          <GradientStop Offset="0.55" Color="#23211F" />
+          <GradientStop Offset="1" Color="#1A1816" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <Grid x:Name="TwinkleLayer" IsHitTestVisible="False">
+      <Ellipse x:Name="Twinkle1" Width="5" Height="5" Fill="{StaticResource WorkbenchAccentGlow}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="70,90,0,0" />
+      <Ellipse x:Name="Twinkle2" Width="4" Height="4" Fill="{StaticResource WorkbenchText}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,60,0,0" />
+      <Ellipse x:Name="Twinkle3" Width="6" Height="6" Fill="{StaticResource WorkbenchWarning}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,120,80,0" />
+      <Ellipse x:Name="Twinkle4" Width="4" Height="4" Fill="{StaticResource WorkbenchAccentGlow}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,190" />
+      <Ellipse x:Name="Twinkle5" Width="5" Height="5" Fill="{StaticResource WorkbenchSuccess}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="100,0,0,210" />
+      <Ellipse x:Name="Twinkle6" Width="3" Height="3" Fill="{StaticResource WorkbenchTextMuted}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="300,40,0,0" />
+    </Grid>
+
+    <StackPanel Margin="32,22,32,20" Spacing="0">
+      <Grid Width="210" Height="210" HorizontalAlignment="Center">
+        <Ellipse x:Name="RingEllipse"
+                 Stroke="{StaticResource WorkbenchAccent}"
+                 StrokeThickness="3"
+                 StrokeDashArray="3,11"
+                 Opacity="0.55" />
+        <Ellipse x:Name="LogoGlow" Width="150" Height="150" Opacity="0.35" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Ellipse.Fill>
+            <RadialGradientBrush>
+              <GradientStop Offset="0" Color="#E07C30" />
+              <GradientStop Offset="1" Color="#00000000" />
+            </RadialGradientBrush>
+          </Ellipse.Fill>
+        </Ellipse>
+        <Image x:Name="LogoImage"
+               Source="avares://Gamelistify/Assets/Views/AboutWindow/aboutwindow-logo.png"
+               Width="110"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center" />
       </Grid>
 
-      <Grid Grid.Row="3" ColumnDefinitions="Auto,*" ColumnSpacing="10">
-        <TextBlock Text="Build" Classes="muted" />
-        <TextBlock Grid.Column="1" Text="{Binding Build}" />
-      </Grid>
+      <TextBlock Text="{Binding ProjectName}"
+                 FontSize="30"
+                 FontWeight="Bold"
+                 HorizontalAlignment="Center"
+                 Foreground="{StaticResource WorkbenchText}">
+        <TextBlock.Effect>
+          <BlurEffect Radius="14" />
+        </TextBlock.Effect>
+      </TextBlock>
+      <TextBlock Text="{Binding ProjectName}"
+                 FontSize="30"
+                 FontWeight="Bold"
+                 HorizontalAlignment="Center"
+                 Margin="0,-40,0,0"
+                 Foreground="{StaticResource WorkbenchAccentGlow}" />
 
-      <Border Grid.Row="4" Background="{StaticResource WorkbenchSurfaceAlt}" CornerRadius="8" Padding="12">
-        <StackPanel Spacing="8">
-          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-            <TextBlock Text="Author" Classes="muted" />
-            <TextBlock Grid.Column="1" Text="{Binding Author}" />
-          </Grid>
-          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-            <TextBlock Text="License" Classes="muted" />
-            <TextBlock Grid.Column="1" Text="{Binding License}" />
-          </Grid>
-          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-            <TextBlock Text="Repository" Classes="muted" />
-            <Button Grid.Column="1" Classes="link-button" HorizontalAlignment="Left" Content="{Binding RepositoryUrl}" Click="OnRepositoryClick" />
-          </Grid>
-          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-            <TextBlock Text="Issues" Classes="muted" />
-            <Button Grid.Column="1" Classes="link-button" HorizontalAlignment="Left" Content="{Binding IssueTrackerUrl}" Click="OnIssuesClick" />
-          </Grid>
+      <Border Margin="0,14,0,0"
+              Background="{StaticResource WorkbenchSurfaceAlt}"
+              CornerRadius="6"
+              ClipToBounds="True"
+              Height="26"
+              VerticalAlignment="Center">
+        <StackPanel x:Name="MarqueePanel" Orientation="Horizontal">
+          <TextBlock x:Name="MarqueeText1"
+                     Text="GAMELISTIFY — YOUR RETRO LIBRARY WORKBENCH • EDIT SAFELY • SCRAPE SMARTER • KEEP EVERY BACKUP • "
+                     FontSize="13"
+                     FontWeight="Bold"
+                     Foreground="{StaticResource WorkbenchWarning}"
+                     VerticalAlignment="Center"
+                     Margin="0,0,40,0" />
+          <TextBlock x:Name="MarqueeText2"
+                     Text="GAMELISTIFY — YOUR RETRO LIBRARY WORKBENCH • EDIT SAFELY • SCRAPE SMARTER • KEEP EVERY BACKUP • "
+                     FontSize="13"
+                     FontWeight="Bold"
+                     Foreground="{StaticResource WorkbenchWarning}"
+                     VerticalAlignment="Center"
+                     Margin="0,0,40,0" />
         </StackPanel>
       </Border>
 
-      <Button Grid.Row="5" HorizontalAlignment="Right" MinWidth="120" Classes="command-button primary" Click="OnCloseClick" ToolTip.Tip="Close the About window">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/AboutWindow/aboutwindow-close-32.png" />
-          <TextBlock Text="Close" />
-        </StackPanel>
-      </Button>
-    </Grid>
-  </Border>
+      <TextBlock x:Name="VersionText"
+                 Text="{Binding Version}"
+                 FontSize="16"
+                 FontWeight="Bold"
+                 HorizontalAlignment="Center"
+                 Margin="0,14,0,0"
+                 Foreground="{StaticResource WorkbenchSuccess}" />
+
+      <TextBlock Text="{Binding Description}"
+                 TextWrapping="Wrap"
+                 TextAlignment="Center"
+                 HorizontalAlignment="Center"
+                 MaxWidth="480"
+                 Foreground="{StaticResource WorkbenchTextMuted}" />
+
+      <Border Margin="0,16,0,0"
+              Background="{StaticResource WorkbenchSurfaceAlt}"
+              CornerRadius="8"
+              Padding="14,10">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="18" RowDefinitions="Auto,Auto,Auto,Auto">
+          <TextBlock Grid.Column="0" Grid.Row="0" Text="Version" Classes="muted" />
+          <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Version}" Foreground="{StaticResource WorkbenchText}" />
+          <TextBlock Grid.Column="2" Grid.Row="0" Text="Build" Classes="muted" />
+          <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding Build}" Foreground="{StaticResource WorkbenchText}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="1" Text="Author" Classes="muted" Margin="0,8,0,0" />
+          <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Author}" Foreground="{StaticResource WorkbenchText}" Margin="0,8,0,0" />
+          <TextBlock Grid.Column="2" Grid.Row="1" Text="License" Classes="muted" Margin="0,8,0,0" />
+          <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding License}" Foreground="{StaticResource WorkbenchText}" Margin="0,8,0,0" />
+
+          <TextBlock Grid.Column="0" Grid.Row="2" Text="Platform" Classes="muted" Margin="0,8,0,0" />
+          <TextBlock Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Text="Windows · Linux · macOS" Foreground="{StaticResource WorkbenchText}" Margin="0,8,0,0" />
+
+          <TextBlock Grid.Column="0" Grid.Row="3" Text="Stack" Classes="muted" Margin="0,8,0,0" />
+          <TextBlock Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3" Text=".NET 8 · Avalonia · CommunityToolkit.Mvvm · Serilog" Foreground="{StaticResource WorkbenchText}" Margin="0,8,0,0" />
+        </Grid>
+      </Border>
+
+      <WrapPanel Margin="0,12,0,0" HorizontalAlignment="Center">
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text=".NET 8" /></Border>
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text="Avalonia" /></Border>
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text="MVVM" /></Border>
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text="Serilog" /></Border>
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text="xUnit" /></Border>
+        <Border Classes="about-chip" Margin="0,0,8,8"><TextBlock Text="Numix Icons" /></Border>
+      </WrapPanel>
+
+      <TextBlock Text="Icons rendered from the Numix theme (GPL-3.0). Gamelistify is free software, licensed under GPL-3.0-only."
+                 Classes="muted"
+                 FontSize="11"
+                 TextWrapping="Wrap"
+                 TextAlignment="Center"
+                 HorizontalAlignment="Center"
+                 MaxWidth="480" />
+
+      <Grid Margin="0,12,0,0" ColumnDefinitions="Auto,Auto,*,Auto">
+        <Button Grid.Column="0" Classes="command-button" Click="OnRepositoryClick" ToolTip.Tip="Open the repository">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-about-32.png" />
+            <TextBlock Text="Repository" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="1" Classes="command-button" Margin="8,0,0,0" Click="OnIssuesClick" ToolTip.Tip="Report a bug or request a feature">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/MainWindow/mainwindow-warning-32.png" />
+            <TextBlock Text="Issues" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="3" Classes="command-button primary" Click="OnCloseClick" ToolTip.Tip="Close the About window">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Image Classes="dialog-icon" Source="avares://Gamelistify/Assets/Views/AboutWindow/aboutwindow-close-32.png" />
+            <TextBlock Text="Close" />
+          </StackPanel>
+        </Button>
+      </Grid>
+    </StackPanel>
+  </Grid>
 </Window>

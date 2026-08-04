@@ -86,7 +86,19 @@ Current version: **0.1.0** — pre-1.0. Status reflects the `main` branch.
 - [ ] screenshots in README and docs
 - [ ] website publishing from `docs/`
 
-## Phase 6 - Pre-1.0 Hardening
+## Phase 6 - Feature Parity Gaps
+
+- [x] Save As (Save flyout; document retargets to the new file)
+- [x] Show Hidden toggle in the filter row
+- [x] Grid keyboard shortcuts (Ctrl+A, Ctrl+I, H/F/U/G)
+- [x] Set Name from Filename bulk command
+- [x] Batch Favorite by Names window
+- [x] Detect & Hide Duplicates (plan preview + favorite transfer)
+- [x] Detect & Hide Bad Versions (plan preview + favorite transfer)
+- [x] Review Hidden & Favorites (auto-unhide candidates with confirm)
+- [x] Tools flyout with library utilities
+
+## Phase 7 - Pre-1.0 Hardening
 
 - [ ] first tagged release with prebuilt binaries
 - [ ] end-to-end smoke testing on all three platforms

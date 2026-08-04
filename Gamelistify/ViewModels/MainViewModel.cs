@@ -27,6 +27,9 @@ public partial class MainViewModel : ViewModelBase
     private int _selectedFilterIndex;
 
     [ObservableProperty]
+    private bool _showHiddenEntries = true;
+
+    [ObservableProperty]
     private string _statusText = "Ready. Open a gamelist.xml file to begin.";
 
     [ObservableProperty]
@@ -174,6 +177,8 @@ public partial class MainViewModel : ViewModelBase
 
     public Func<Task<string?>>? PickRomFileAsync { get; set; }
 
+    public Func<Task<string?>>? PickSavePathAsync { get; set; }
+
     public Func<string?, Task<string?>>? PickFolderAsync { get; set; }
 
     public Func<Task>? ShowAboutAsync { get; set; }
@@ -189,6 +194,10 @@ public partial class MainViewModel : ViewModelBase
     public Func<string, string?, Task<string?>>? PickMediaFileAsync { get; set; }
 
     public Func<string, string, Task<bool>>? ConfirmAsync { get; set; }
+
+    public Func<Task<IReadOnlyList<string>?>>? ShowBatchFavoriteAsync { get; set; }
+
+    public Func<HygienePlan, Task<bool>>? ShowHygienePlanAsync { get; set; }
 
     public Func<Task<ExitDecision>>? ShowExitConfirmAsync { get; set; }
 
@@ -263,6 +272,11 @@ public partial class MainViewModel : ViewModelBase
     }
 
     partial void OnSelectedFilterIndexChanged(int value)
+    {
+        ApplySearchFilter();
+    }
+
+    partial void OnShowHiddenEntriesChanged(bool value)
     {
         ApplySearchFilter();
     }
@@ -550,6 +564,47 @@ public partial class MainViewModel : ViewModelBase
             Logger.Error(ex, "Save failed for {Path}", _loadedDocument.SourcePath);
             StatusText = "Save failed. Check the log for details.";
             return false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSave))]
+    private async Task SaveAsAsync()
+    {
+        if (_loadedDocument is null)
+            return;
+
+        if (PickSavePathAsync is null)
+        {
+            Logger.Warning("Save As requested before delegate wiring");
+            StatusText = "Save As action is not wired yet.";
+            return;
+        }
+
+        var destinationPath = await PickSavePathAsync();
+        if (string.IsNullOrWhiteSpace(destinationPath))
+        {
+            Logger.Debug("Save As cancelled");
+            StatusText = "Save As cancelled.";
+            return;
+        }
+
+        try
+        {
+            Logger.Information("Saving current gamelist as {Path}", destinationPath);
+            await GamelistService.SaveAsync(_loadedDocument, destinationPath, createBackup: false);
+            _loadedDocument.SourcePath = destinationPath;
+            CurrentFilePath = destinationPath;
+            IsDirty = false;
+            _settings.LastGamelistDirectory = Path.GetDirectoryName(destinationPath) ?? string.Empty;
+            RegisterRecentFile(destinationPath);
+            await SettingsService.SaveAsync(AppPaths.SettingsPath, _settings);
+            UpdateWindowTitle();
+            StatusText = $"Saved as {Path.GetFileName(destinationPath)}.";
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Save As failed for {Path}", destinationPath);
+            StatusText = "Save As failed. Check the log for details.";
         }
     }
 
@@ -968,7 +1023,190 @@ public partial class MainViewModel : ViewModelBase
         ApplyBulkBooleanField("favorite", false, "Selected entries unfavorited.");
     }
 
+    [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
+    private void ToggleHiddenSelected()
+    {
+        if (_selectedEntries.Count == 0)
+            return;
+
+        var anyVisible = _selectedEntries.Any(row => !row.Hidden);
+        ApplyBulkBooleanField("hidden", anyVisible, anyVisible ? "Selected entries hidden." : "Selected entries unhidden.");
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
+    private void ToggleFavoriteSelected()
+    {
+        if (_selectedEntries.Count == 0)
+            return;
+
+        var anyUnfavorite = _selectedEntries.Any(row => !row.Favorite);
+        ApplyBulkBooleanField("favorite", anyUnfavorite, anyUnfavorite ? "Selected entries favorited." : "Selected entries unfavorited.");
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunBulkAction))]
+    private void SetNameFromFilename()
+    {
+        if (_selectedEntries.Count == 0)
+            return;
+
+        var updated = 0;
+        Logger.Information("Setting name from filename for {Count} selected entries", _selectedEntries.Count);
+        foreach (var row in _selectedEntries)
+        {
+            var fileName = Path.GetFileName(row.Path);
+            var name = string.IsNullOrWhiteSpace(fileName) ? null : Path.GetFileNameWithoutExtension(fileName);
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            row.Entry.SetField("name", name);
+            row.Refresh();
+            updated++;
+        }
+
+        if (updated == 0)
+        {
+            StatusText = "No selected entry has a usable file path.";
+            return;
+        }
+
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = $"Set name from filename for {updated} entr{(updated == 1 ? "y" : "ies")}.";
+        if (SelectedEntry is not null)
+            UpdateDetailPane(SelectedEntry);
+        RefreshVisibleRows();
+    }
+
     private bool CanRunBulkAction() => _selectedEntries.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanRunLibraryAction))]
+    private async Task BatchFavoriteAsync()
+    {
+        if (_loadedDocument is null || ShowBatchFavoriteAsync is null)
+            return;
+
+        Logger.Information("Batch favorite by names requested");
+        var names = await ShowBatchFavoriteAsync();
+        if (names is null || names.Count == 0)
+        {
+            Logger.Debug("Batch favorite dialog cancelled or empty");
+            return;
+        }
+
+        var targetNames = names.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var matched = new List<GameRowViewModel>();
+        foreach (var row in _allEntries)
+        {
+            if (targetNames.Contains(row.Name) && !row.Favorite)
+            {
+                row.Entry.SetBooleanField("favorite", true);
+                row.Refresh();
+                matched.Add(row);
+            }
+        }
+
+        if (matched.Count == 0)
+        {
+            StatusText = "No entries matched the given names.";
+            return;
+        }
+
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = $"Favorited {matched.Count} entr{(matched.Count == 1 ? "y" : "ies")}.";
+        RefreshVisibleRows();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunLibraryAction))]
+    private async Task DetectDuplicatesAsync()
+    {
+        if (_loadedDocument is null || ShowHygienePlanAsync is null)
+            return;
+
+        Logger.Information("Detect & hide duplicates requested");
+        var plan = LibraryHygieneService.BuildDuplicatesPlan(_allEntries.Select(static r => r.Entry));
+        if (plan.ToHide.Count == 0)
+        {
+            StatusText = "No duplicates found.";
+            return;
+        }
+
+        if (!await ShowHygienePlanAsync(plan))
+        {
+            Logger.Debug("Duplicates plan cancelled");
+            return;
+        }
+
+        var hidden = plan.Apply();
+        ApplyHygieneResult($"Hid {hidden} duplicate entr{(hidden == 1 ? "y" : "ies")}.");
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunLibraryAction))]
+    private async Task DetectBadVersionsAsync()
+    {
+        if (_loadedDocument is null || ShowHygienePlanAsync is null)
+            return;
+
+        Logger.Information("Detect & hide bad versions requested");
+        var plan = LibraryHygieneService.BuildBadVersionsPlan(_allEntries.Select(static r => r.Entry));
+        if (plan.ToHide.Count == 0)
+        {
+            StatusText = "No bad versions found.";
+            return;
+        }
+
+        if (!await ShowHygienePlanAsync(plan))
+        {
+            Logger.Debug("Bad versions plan cancelled");
+            return;
+        }
+
+        var hidden = plan.Apply();
+        ApplyHygieneResult($"Hid {hidden} bad version entr{(hidden == 1 ? "y" : "ies")}.");
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunLibraryAction))]
+    private async Task ReviewHiddenFavoritesAsync()
+    {
+        if (_loadedDocument is null)
+            return;
+
+        Logger.Information("Review hidden & favorites requested");
+        var toReveal = LibraryHygieneService.FindEntriesToReveal(_allEntries.Select(static r => r.Entry));
+        if (toReveal.Count == 0)
+        {
+            StatusText = "No hidden entries need review.";
+            return;
+        }
+
+        var names = string.Join("\n", toReveal.Select(static e => e.Name));
+        if (ConfirmAsync is not null
+            && !await ConfirmAsync("Review Hidden & Favorites",
+                $"The following entries are hidden but should probably stay visible:\n\n{names}\n\nUnhide them?"))
+        {
+            Logger.Debug("Review reveal cancelled");
+            return;
+        }
+
+        foreach (var entry in toReveal)
+            entry.SetBooleanField("hidden", false);
+
+        ApplyHygieneResult($"Unhid {toReveal.Count} entr{(toReveal.Count == 1 ? "y" : "ies")}.");
+    }
+
+    private void ApplyHygieneResult(string statusMessage)
+    {
+        IsDirty = true;
+        UpdateWindowTitle();
+        StatusText = statusMessage;
+        foreach (var row in _allEntries)
+            row.Refresh();
+        RefreshVisibleRows();
+        if (SelectedEntry is not null)
+            UpdateDetailPane(SelectedEntry);
+    }
+
+    private bool CanRunLibraryAction() => _loadedDocument is not null;
 
     private void ApplySearchFilter()
     {
@@ -991,6 +1229,8 @@ public partial class MainViewModel : ViewModelBase
         if (SelectedFilterIndex == 1 && row.Entry.Kind != GamelistEntryKind.Game)
             return false;
         if (SelectedFilterIndex == 2 && row.Entry.Kind != GamelistEntryKind.Folder)
+            return false;
+        if (!ShowHiddenEntries && row.Hidden)
             return false;
 
         var search = SearchText.Trim();
@@ -1173,6 +1413,9 @@ public partial class MainViewModel : ViewModelBase
         UnhideSelectedCommand.NotifyCanExecuteChanged();
         FavoriteSelectedCommand.NotifyCanExecuteChanged();
         UnfavoriteSelectedCommand.NotifyCanExecuteChanged();
+        ToggleHiddenSelectedCommand.NotifyCanExecuteChanged();
+        ToggleFavoriteSelectedCommand.NotifyCanExecuteChanged();
+        SetNameFromFilenameCommand.NotifyCanExecuteChanged();
         RemoveSelectedEntriesCommand.NotifyCanExecuteChanged();
         ScrapeSelectedCommand.NotifyCanExecuteChanged();
     }
@@ -1217,6 +1460,7 @@ public partial class MainViewModel : ViewModelBase
         Logger.Information("Loaded {Count} entries from {FilePath}", _allEntries.Count, filePath);
         OnPropertyChanged(nameof(HasLoadedDocument));
         SaveCommand.NotifyCanExecuteChanged();
+        SaveAsCommand.NotifyCanExecuteChanged();
         RemoveEntryCommand.NotifyCanExecuteChanged();
         ReloadCommand.NotifyCanExecuteChanged();
         RestoreBackupCommand.NotifyCanExecuteChanged();
@@ -1229,9 +1473,16 @@ public partial class MainViewModel : ViewModelBase
         UnhideSelectedCommand.NotifyCanExecuteChanged();
         FavoriteSelectedCommand.NotifyCanExecuteChanged();
         UnfavoriteSelectedCommand.NotifyCanExecuteChanged();
+        ToggleHiddenSelectedCommand.NotifyCanExecuteChanged();
+        ToggleFavoriteSelectedCommand.NotifyCanExecuteChanged();
+        SetNameFromFilenameCommand.NotifyCanExecuteChanged();
         RemoveSelectedEntriesCommand.NotifyCanExecuteChanged();
         ScrapeSelectedCommand.NotifyCanExecuteChanged();
         ScrapeAllCommand.NotifyCanExecuteChanged();
+        BatchFavoriteCommand.NotifyCanExecuteChanged();
+        DetectDuplicatesCommand.NotifyCanExecuteChanged();
+        DetectBadVersionsCommand.NotifyCanExecuteChanged();
+        ReviewHiddenFavoritesCommand.NotifyCanExecuteChanged();
     }
 
     private void SyncRecentFiles()

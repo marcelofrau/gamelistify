@@ -100,6 +100,33 @@ public partial class App : Application
                 return path;
             };
 
+            mainViewModel.PickSavePathAsync = async () =>
+            {
+                Logger.Debug("Save As file dialog requested");
+                var suggestedFileName = Path.GetFileName(mainViewModel.CurrentFilePath);
+                if (suggestedFileName == "No file loaded")
+                    suggestedFileName = "gamelist.xml";
+
+                var file = await mainWindow.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                {
+                    Title = "Save As",
+                    SuggestedFileName = suggestedFileName,
+                    DefaultExtension = "xml",
+                    FileTypeChoices =
+                    [
+                        new FilePickerFileType("Gamelist XML")
+                        {
+                            Patterns = ["*.xml"],
+                            MimeTypes = ["application/xml", "text/xml"],
+                        },
+                    ],
+                });
+
+                var path = file?.TryGetLocalPath();
+                Logger.Debug("Save As file dialog result: {Path}", path ?? "<none>");
+                return path;
+            };
+
             mainViewModel.PickMediaFileAsync = async (fieldName, baseDirectory) =>
             {
                 Logger.Debug("Media file picker requested for {Field}", fieldName);
@@ -152,7 +179,7 @@ public partial class App : Application
             {
                 Logger.Information("Showing About window");
                 var aboutWindow = new AboutWindow();
-                await aboutWindow.ShowDialog(mainWindow);
+                await ShowDialogDimmed(aboutWindow, mainWindow);
                 Logger.Information("About window closed");
             };
 
@@ -166,7 +193,7 @@ public partial class App : Application
                     DataContext = settingsViewModel,
                 };
 
-                var result = await settingsWindow.ShowDialog<bool?>(mainWindow);
+                var result = await ShowDialogDimmed<bool?>(settingsWindow, mainWindow);
                 if (result != true)
                 {
                     Logger.Debug("Settings window closed without save");
@@ -202,9 +229,44 @@ public partial class App : Application
                         Message = message,
                     },
                 };
-                var result = await confirmWindow.ShowDialog<bool>(mainWindow);
+                var result = await ShowDialogDimmed<bool>(confirmWindow, mainWindow);
                 Logger.Debug("Confirmation result: {Result}", result);
                 return result;
+            };
+
+            mainViewModel.ShowBatchFavoriteAsync = async () =>
+            {
+                Logger.Information("Showing Batch Favorite window");
+                var batchFavoriteViewModel = new BatchFavoriteViewModel();
+                var batchFavoriteWindow = new BatchFavoriteWindow
+                {
+                    DataContext = batchFavoriteViewModel,
+                };
+
+                var result = await ShowDialogDimmed<bool?>(batchFavoriteWindow, mainWindow);
+                if (result != true)
+                {
+                    Logger.Debug("Batch Favorite window cancelled");
+                    return null;
+                }
+
+                var names = batchFavoriteViewModel.Names;
+                Logger.Information("Batch Favorite accepted with {Count} names", names.Count);
+                return names;
+            };
+
+            mainViewModel.ShowHygienePlanAsync = async plan =>
+            {
+                Logger.Information("Showing hygiene plan window: {Title}", plan.Title);
+                var planViewModel = new HygienePlanViewModel(plan);
+                var planWindow = new HygienePlanWindow
+                {
+                    DataContext = planViewModel,
+                };
+
+                var result = await ShowDialogDimmed<bool?>(planWindow, mainWindow);
+                Logger.Debug("Hygiene plan window result: {Result}", result is true);
+                return result == true;
             };
 
             mainViewModel.ShowExitConfirmAsync = () =>
@@ -218,7 +280,7 @@ public partial class App : Application
                         Message = "You have unsaved changes. Save and exit, or exit without saving?",
                     },
                 };
-                return exitWindow.ShowDialog<ExitDecision>(mainWindow);
+                return ShowDialogDimmed<ExitDecision>(exitWindow, mainWindow);
             };
 
             mainViewModel.ShowRestoreBackupAsync = backups =>
@@ -228,7 +290,7 @@ public partial class App : Application
                 {
                     DataContext = new RestoreBackupViewModel(backups),
                 };
-                return restoreWindow.ShowDialog<string?>(mainWindow);
+                return ShowDialogDimmed<string?>(restoreWindow, mainWindow);
             };
 
             mainViewModel.ReviewScannedRomsAsync = async (items, directory) =>
@@ -240,7 +302,7 @@ public partial class App : Application
                     DataContext = scanViewModel,
                 };
 
-                var result = await scanWindow.ShowDialog<bool?>(mainWindow);
+                var result = await ShowDialogDimmed<bool?>(scanWindow, mainWindow);
                 if (result != true)
                 {
                     Logger.Debug("Scan ROMs review window cancelled");
@@ -260,7 +322,7 @@ public partial class App : Application
                     DataContext = optionsViewModel,
                 };
 
-                var result = await optionsWindow.ShowDialog<bool?>(mainWindow);
+                var result = await ShowDialogDimmed<bool?>(optionsWindow, mainWindow);
                 if (result != true)
                 {
                     Logger.Debug("Scrape options window cancelled");
@@ -279,7 +341,7 @@ public partial class App : Application
                     DataContext = progressViewModel,
                 };
 
-                await progressWindow.ShowDialog(mainWindow);
+                await ShowDialogDimmed(progressWindow, mainWindow);
                 Logger.Information("Scrape progress window closed: {Title}", progressViewModel.Title);
             };
 
@@ -315,6 +377,32 @@ public partial class App : Application
         {
             Logger.Fatal(ex, "Fatal exception during async startup initialization");
             throw;
+        }
+    }
+
+    private static async Task<T> ShowDialogDimmed<T>(Window dialog, MainWindow owner)
+    {
+        owner.SetDialogDim(true);
+        try
+        {
+            return await dialog.ShowDialog<T>(owner);
+        }
+        finally
+        {
+            owner.SetDialogDim(false);
+        }
+    }
+
+    private static async Task ShowDialogDimmed(Window dialog, MainWindow owner)
+    {
+        owner.SetDialogDim(true);
+        try
+        {
+            await dialog.ShowDialog(owner);
+        }
+        finally
+        {
+            owner.SetDialogDim(false);
         }
     }
 

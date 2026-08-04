@@ -27,6 +27,11 @@ public partial class MainWindow : Window
         _ = ConfirmExitAndCloseAsync();
     }
 
+    public void SetDialogDim(bool dimmed)
+    {
+        DialogDimOverlay.IsVisible = dimmed;
+    }
+
     private async Task ConfirmExitAndCloseAsync()
     {
         if (DataContext is not MainViewModel viewModel)
@@ -62,6 +67,57 @@ public partial class MainWindow : Window
             SearchBox.Focus();
             SearchBox.SelectAll();
             e.Handled = true;
+            return;
+        }
+
+        if (!EntriesGrid.IsFocused || DataContext is not MainViewModel viewModel)
+            return;
+
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        {
+            switch (e.Key)
+            {
+                case Key.A:
+                    EntriesGrid.SelectAll();
+                    e.Handled = true;
+                    break;
+                case Key.I:
+                    InvertGridSelection(viewModel);
+                    e.Handled = true;
+                    break;
+            }
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case Key.H when viewModel.ToggleHiddenSelectedCommand.CanExecute(null):
+                viewModel.ToggleHiddenSelectedCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.F when viewModel.ToggleFavoriteSelectedCommand.CanExecute(null):
+                viewModel.ToggleFavoriteSelectedCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.U when viewModel.UnhideSelectedCommand.CanExecute(null):
+                viewModel.UnhideSelectedCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.G when viewModel.UnfavoriteSelectedCommand.CanExecute(null):
+                viewModel.UnfavoriteSelectedCommand.Execute(null);
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private void InvertGridSelection(MainViewModel viewModel)
+    {
+        var selected = new HashSet<object>(EntriesGrid.SelectedItems.Cast<object>());
+        EntriesGrid.SelectedItems.Clear();
+        foreach (var row in viewModel.VisibleEntries)
+        {
+            if (!selected.Contains(row))
+                EntriesGrid.SelectedItems.Add(row);
         }
     }
 
