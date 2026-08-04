@@ -87,9 +87,7 @@ public sealed class BackupService
         Logger.Information("Restoring backup {BackupPath} over {SourcePath}", backupPath, sourcePath);
         await CreateBackupAsync(sourcePath, cancellationToken: cancellationToken);
 
-        await using var backupStream = File.Open(backupPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        await using var targetStream = File.Create(sourcePath);
-        await backupStream.CopyToAsync(targetStream, cancellationToken);
+        File.Copy(backupPath, sourcePath, overwrite: true);
         Logger.Information("Restored backup {BackupPath} to {SourcePath}", backupPath, sourcePath);
     }
 }
